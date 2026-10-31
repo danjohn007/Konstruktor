@@ -55,7 +55,7 @@ $sidebarFoot = ob_get_clean();
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/inter@5.1.0/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="<?= recurso('assets/css/app.css') ?>">
 </head>
 <body>
 <aside class="sidebar d-none d-lg-flex">
@@ -144,7 +144,7 @@ $sidebarFoot = ob_get_clean();
 <?php if (!empty($graficas)): ?>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
 <?php endif; ?>
-<script src="assets/js/app.js"></script>
+<script src="<?= recurso('assets/js/app.js') ?>"></script>
 <script>
 document.getElementById('formMiPassword').addEventListener('submit', async (e) => {
     e.preventDefault();
