@@ -6,8 +6,8 @@ $soloOficina = $esIngeniero ? ' d-none' : '';
 ?>
 <div class="d-flex flex-wrap gap-2 justify-content-between align-items-start mb-3">
   <div>
-    <div class="fs-5 fw-semibold" id="hObra"></div>
-    <div class="text-muted small" id="hSub"></div>
+    <h1 class="page-title" id="hObra"></h1>
+    <div class="page-subtitle" id="hSub"></div>
   </div>
   <div class="d-flex flex-wrap gap-2">
     <button class="btn btn-outline-secondary" id="btnPrecios" title="Copia a los análisis los precios vigentes del catálogo de insumos"><i class="bi bi-arrow-repeat"></i> Actualizar precios</button>
@@ -19,15 +19,15 @@ $soloOficina = $esIngeniero ? ' d-none' : '';
 </div>
 
 <div class="row g-3 mb-3">
-  <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Subtotal</div><div class="stat-value fs-4" id="tSubtotal">–</div></div></div>
-  <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label" id="tIvaLbl">IVA</div><div class="stat-value fs-4" id="tIva">–</div></div></div>
-  <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Total</div><div class="stat-value fs-4" id="tTotal">–</div></div></div>
-  <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Conceptos sin análisis</div><div class="stat-value fs-4" id="tSinAnalisis">–</div></div></div>
+  <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Subtotal</div><div class="stat-value fs-4" id="tSubtotal">–</div></div></div>
+  <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label" id="tIvaLbl">IVA</div><div class="stat-value fs-4" id="tIva">–</div></div></div>
+  <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Total</div><div class="stat-value fs-4" id="tTotal">–</div></div></div>
+  <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Conceptos sin análisis</div><div class="stat-value fs-4" id="tSinAnalisis">–</div></div></div>
 </div>
 
 <ul class="nav nav-tabs nav-tabs-scroll mb-3" role="tablist">
   <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabCatalogo" type="button">Catálogo y P.U.</button></li>
-  <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabExplosion" type="button">Explosión de insumos</button></li>
+  <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabExplosion" type="button" id="navExplosion">Explosión de insumos</button></li>
   <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabPrograma" type="button">Programa de obra</button></li>
   <li class="nav-item<?= $soloOficina ?>"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabDatos" type="button">Datos generales</button></li>
   <li class="nav-item<?= $soloOficina ?>"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabEstimaciones" type="button" id="navEstimaciones">Estimaciones</button></li>
@@ -52,12 +52,33 @@ $soloOficina = $esIngeniero ? ' d-none' : '';
 
   <!-- Explosión -->
   <div class="tab-pane fade" id="tabExplosion">
-    <div class="card"><div class="table-responsive">
-      <table class="table table-sm mb-0">
-        <thead><tr><th>Clave</th><th>Descripción</th><th>Tipo</th><th>U.</th><th class="num">Cantidad total</th><th class="num">Precio</th><th class="num">Importe</th></tr></thead>
-        <tbody id="tablaExplosion"></tbody>
-      </table>
-    </div></div>
+    <div class="row g-3 mb-3" id="graficasExplosion">
+      <div class="col-lg-5">
+        <div class="card h-100">
+          <div class="card-titulo"><div><h3>Composición del costo de insumos</h3><p>Materiales, mano de obra y equipo</p></div></div>
+          <div class="p-3"><div class="grafica grafica-sm" id="gComposicion"></div></div>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="card h-100">
+          <div class="card-titulo"><div><h3>Los insumos que más pesan</h3><p id="paretoSub"></p></div></div>
+          <div class="p-3"><div class="grafica grafica-sm" id="gPareto"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="filtros">
+        <div class="chips" id="chipsExplosion"></div>
+        <div class="buscador ms-auto"><i class="bi bi-search"></i><input class="form-control" id="buscarExplosion" placeholder="Buscar insumo…"></div>
+      </div>
+      <div class="table-responsive tabla-alta">
+        <table class="table table-sm mb-0">
+          <thead><tr><th>Clave</th><th>Descripción</th><th>Tipo</th><th>U.</th><th class="num">Cantidad total</th><th class="num">Precio</th><th class="num">Importe</th></tr></thead>
+          <tbody id="tablaExplosion"></tbody>
+        </table>
+      </div>
+      <div class="d-flex justify-content-between px-3 py-2 border-top small"><span class="text-muted" id="explosionCuenta"></span><strong id="explosionTotal"></strong></div>
+    </div>
     <p class="text-muted small mt-2">Costo directo de insumos (sin herramienta menor, indirectos ni utilidad). Sirve para el programa de compras.</p>
   </div>
 
@@ -100,10 +121,10 @@ $soloOficina = $esIngeniero ? ' d-none' : '';
   <!-- Estimaciones -->
   <div class="tab-pane fade" id="tabEstimaciones">
     <div class="row g-3 mb-3">
-      <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Contrato (sin IVA)</div><div class="stat-value fs-5" id="eContrato">–</div></div></div>
-      <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Estimado acumulado</div><div class="stat-value fs-5" id="eEstimado">–</div></div></div>
-      <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Por estimar</div><div class="stat-value fs-5" id="ePorEstimar">–</div></div></div>
-      <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Anticipo amortizado</div><div class="stat-value fs-5" id="eAmortizado">–</div></div></div>
+      <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Contrato (sin IVA)</div><div class="stat-value fs-5" id="eContrato">–</div></div></div>
+      <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Estimado acumulado</div><div class="stat-value fs-5" id="eEstimado">–</div></div></div>
+      <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Por estimar</div><div class="stat-value fs-5" id="ePorEstimar">–</div></div></div>
+      <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Anticipo amortizado</div><div class="stat-value fs-5" id="eAmortizado">–</div></div></div>
     </div>
     <div class="d-flex justify-content-between align-items-center mb-2">
       <span class="text-muted small" id="eAviso"></span>
@@ -120,70 +141,90 @@ $soloOficina = $esIngeniero ? ' d-none' : '';
   <!-- Avance (hoja AVANCE del Excel) -->
   <div class="tab-pane fade" id="tabAvance">
     <div class="row g-3 mb-3">
-      <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Avance físico / programado a hoy</div><div class="stat-value fs-5" id="aAvance">–</div><div class="small text-muted" id="aAvanceSub"></div></div></div>
-      <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Importe ejecutado</div><div class="stat-value fs-5" id="aEjecutado">–</div><div class="small text-muted" id="aEjecutadoSub"></div></div></div>
-      <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Costo real en conceptos</div><div class="stat-value fs-5" id="aCosto">–</div></div></div>
-      <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Gastos generales (sin concepto)</div><div class="stat-value fs-5" id="aGenerales">–</div><div class="small text-muted" id="aGeneralesSub"></div></div></div>
+      <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Avance físico / programado a hoy</div><div class="stat-value fs-5" id="aAvance">–</div><div class="small text-muted" id="aAvanceSub"></div></div></div>
+      <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Importe ejecutado</div><div class="stat-value fs-5" id="aEjecutado">–</div><div class="small text-muted" id="aEjecutadoSub"></div></div></div>
+      <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Costo real en conceptos</div><div class="stat-value fs-5" id="aCosto">–</div></div></div>
+      <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Gastos generales (sin concepto)</div><div class="stat-value fs-5" id="aGenerales">–</div><div class="small text-muted" id="aGeneralesSub"></div></div></div>
     </div>
-    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-2">
-      <h6 class="mb-0">Avance por concepto</h6>
-      <span class="text-muted small" id="aAviso"></span>
-      <button class="btn btn-sm btn-primary" id="btnNuevoAvance"><i class="bi bi-plus-lg"></i> Registrar avance</button>
-    </div>
-    <div class="card mb-3"><div class="table-responsive">
-      <table class="table table-sm table-cotizacion mb-0 align-middle">
-        <thead><tr><th>Clave</th><th>Concepto</th><th>U.</th><th class="num">Cantidad</th><th class="num">Ejecutado</th><th style="width:16%">Avance</th>
-          <th class="num">Costo real</th><th class="num">Diferencia</th>
-          <th class="num" title="Costo real por unidad más la parte proporcional de los gastos generales (como en el Excel)">P.U. real <i class="bi bi-info-circle"></i></th></tr></thead>
-        <tbody id="tablaAvance"></tbody>
-      </table>
-    </div></div>
     <div class="card mb-3" id="cardCurvaS">
       <div class="card-titulo"><div><h3>Curva de avance</h3><p>Importe acumulado por semana: lo programado, lo ejecutado (cantidad × P.U.) y lo gastado</p></div></div>
       <div class="p-3"><div class="grafica" id="gCurvaS"></div></div>
     </div>
-    <h6>Resumen por semana</h6>
-    <div class="card mb-3"><div class="table-responsive tabla-alta">
-      <table class="table table-sm mb-0">
-        <thead><tr><th>Semana</th><th class="num">Programado</th><th class="num">Ejecutado</th><th class="num">Gastado</th><th class="num">Cobrado</th><th class="num">Programado acum.</th><th class="num">Ejecutado acum.</th></tr></thead>
-        <tbody id="tablaAvanceSemanas"></tbody>
-      </table>
-    </div></div>
-    <h6>Registros de avance</h6>
-    <div class="card"><div class="table-responsive tabla-alta">
-      <table class="table table-sm mb-0 align-middle">
-        <thead><tr><th>Fecha</th><th>Concepto</th><th class="num">Cantidad</th><th class="num">Importe</th><th>Notas</th><th>Registró</th><th></th></tr></thead>
-        <tbody id="tablaRegistros"></tbody>
-      </table>
-    </div></div>
+    <div class="card">
+      <div class="filtros">
+        <div class="nav chips" role="tablist">
+          <button class="chip active" data-bs-toggle="pill" data-bs-target="#subAvConceptos" type="button">Por concepto</button>
+          <button class="chip" data-bs-toggle="pill" data-bs-target="#subAvSemanas" type="button">Por semana</button>
+          <button class="chip" data-bs-toggle="pill" data-bs-target="#subAvRegistros" type="button">Registros <span class="cuenta" id="cuentaRegistros">0</span></button>
+        </div>
+        <span class="text-muted small" id="aAviso"></span>
+        <button class="btn btn-sm btn-primary ms-auto" id="btnNuevoAvance"><i class="bi bi-plus-lg"></i> Registrar avance</button>
+      </div>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="subAvConceptos">
+          <div class="table-responsive tabla-alta">
+            <table class="table table-sm table-cotizacion mb-0 align-middle">
+              <thead><tr><th>Clave</th><th>Concepto</th><th>U.</th><th class="num">Cantidad</th><th class="num">Ejecutado</th><th style="width:16%">Avance</th>
+                <th class="num">Costo real</th><th class="num">Diferencia</th>
+                <th class="num" title="Costo real por unidad más la parte proporcional de los gastos generales (como en el Excel)">P.U. real <i class="bi bi-info-circle"></i></th></tr></thead>
+              <tbody id="tablaAvance"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="subAvSemanas">
+          <div class="table-responsive tabla-alta">
+            <table class="table table-sm mb-0">
+              <thead><tr><th>Semana</th><th class="num">Programado</th><th class="num">Ejecutado</th><th class="num">Gastado</th><th class="num">Cobrado</th><th class="num">Programado acum.</th><th class="num">Ejecutado acum.</th></tr></thead>
+              <tbody id="tablaAvanceSemanas"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="subAvRegistros">
+          <div class="table-responsive tabla-alta">
+            <table class="table table-sm mb-0 align-middle">
+              <thead><tr><th>Fecha</th><th>Concepto</th><th class="num">Cantidad</th><th class="num">Importe</th><th>Notas</th><th>Registró</th><th></th></tr></thead>
+              <tbody id="tablaRegistros"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
     <p class="text-muted small mt-2">El importe ejecutado es la cantidad ejecutada por el P.U. contratado. La diferencia es el importe del concepto menos su costo real (los gastos ligados al concepto en <em>Control de obra</em>).</p>
   </div>
 
   <!-- Control de obra -->
   <div class="tab-pane fade" id="tabControl">
     <div class="row g-3 mb-3">
-      <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Avance estimado / programado a hoy</div><div class="stat-value fs-5" id="kAvance">–</div><div class="small text-muted" id="kAvanceSub"></div></div></div>
-      <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Cobrado</div><div class="stat-value fs-5" id="kCobrado">–</div></div></div>
-      <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Gastado</div><div class="stat-value fs-5" id="kGastado">–</div><div class="small text-muted" id="kGastadoSub"></div></div></div>
-      <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Saldo de caja</div><div class="stat-value fs-5" id="kSaldo">–</div><div class="small text-muted" id="kSaldoSub"></div></div></div>
+      <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Avance estimado / programado a hoy</div><div class="stat-value fs-5" id="kAvance">–</div><div class="small text-muted" id="kAvanceSub"></div></div></div>
+      <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Cobrado</div><div class="stat-value fs-5" id="kCobrado">–</div></div></div>
+      <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Gastado</div><div class="stat-value fs-5" id="kGastado">–</div><div class="small text-muted" id="kGastadoSub"></div></div></div>
+      <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Saldo de caja</div><div class="stat-value fs-5" id="kSaldo">–</div><div class="small text-muted" id="kSaldoSub"></div></div></div>
     </div>
     <div class="row g-3 mb-3">
       <div class="col-lg-6"><div class="card p-3 h-100"><h6>Gasto vs. presupuesto por tipo</h6><div class="table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Tipo</th><th class="num">Presupuesto</th><th class="num">Gastado</th><th style="width:30%">Consumido</th></tr></thead><tbody id="tablaPorTipo"></tbody></table></div></div></div>
       <div class="col-lg-6"><div class="card p-3 h-100"><h6>Gasto vs. presupuesto por partida</h6><div class="table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Partida</th><th class="num">Presupuesto</th><th class="num">Gastado</th><th style="width:30%">Consumido</th></tr></thead><tbody id="tablaPorPartida"></tbody></table></div></div></div>
     </div>
-    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-2">
-      <h6 class="mb-0">Movimientos</h6>
-      <div class="d-flex gap-2">
-        <button class="btn btn-sm btn-outline-success<?= $soloOficina ?>" onclick="abrirMovimiento(null, 'ingreso')"><i class="bi bi-plus-lg"></i> Ingreso</button>
-        <button class="btn btn-sm btn-outline-danger" onclick="abrirMovimiento(null, 'egreso')"><i class="bi bi-plus-lg"></i> Egreso</button>
+    <div class="card">
+      <div class="filtros">
+        <div class="chips" id="chipsMov"></div>
+        <select class="form-select form-select-sm w-auto" id="catMov"><option value="">Todas las categorías</option></select>
+        <div class="buscador"><i class="bi bi-search"></i><input class="form-control form-control-sm" id="buscarMov" placeholder="Descripción, proveedor o RFC…"></div>
+        <div class="d-flex gap-2 ms-auto">
+          <button class="btn btn-sm btn-outline-success<?= $soloOficina ?>" onclick="abrirMovimiento(null, 'ingreso')"><i class="bi bi-plus-lg"></i> Ingreso</button>
+          <button class="btn btn-sm btn-outline-danger" onclick="abrirMovimiento(null, 'egreso')"><i class="bi bi-plus-lg"></i> Egreso</button>
+        </div>
+      </div>
+      <div class="table-responsive tabla-alta">
+        <table class="table table-sm mb-0">
+          <thead><tr><th>Fecha</th><th>Tipo</th><th>Categoría</th><th>Descripción</th><th>Proveedor / RFC</th><th>Partida / concepto</th><th class="num">Monto</th></tr></thead>
+          <tbody id="tablaMovimientos"></tbody>
+        </table>
+      </div>
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 px-3 py-2 border-top small">
+        <span class="text-muted" id="movResumen"></span>
+        <button class="btn btn-sm btn-outline-secondary d-none" id="btnMasMov">Mostrar más</button>
       </div>
     </div>
-    <div class="card"><div class="table-responsive">
-      <table class="table table-sm mb-0">
-        <thead><tr><th>Fecha</th><th>Tipo</th><th>Categoría</th><th>Descripción</th><th>Proveedor / RFC</th><th>Partida / concepto</th><th class="num">Monto</th></tr></thead>
-        <tbody id="tablaMovimientos"></tbody>
-      </table>
-    </div></div>
     <p class="text-muted small mt-2">Captura los montos como se pagaron. El presupuesto de costo es el costo directo más los indirectos de cada concepto; lo que queda del contrato es la utilidad presupuestada (<span id="kUtilidad"></span>). Los retiros de utilidad y los préstamos cuentan en el saldo de caja, pero no como gasto ni como cobro de la obra.</p>
   </div>
 
@@ -192,36 +233,50 @@ $soloOficina = $esIngeniero ? ' d-none' : '';
     <div id="flujoVacio" class="alert alert-info d-none">Agrega conceptos con su análisis para ver el programa de compras y el flujo de efectivo.</div>
     <div id="flujoContenido">
       <div class="row g-3 mb-3">
-        <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Anticipo</div><div class="stat-value fs-5" id="fAnticipo">–</div></div></div>
-        <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Estimaciones</div><div class="stat-value fs-5" id="fEstimaciones">–</div></div></div>
-        <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Costo programado</div><div class="stat-value fs-5" id="fCosto">–</div><div class="small text-muted" id="fCostoSub"></div></div></div>
-        <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Saldo mínimo programado</div><div class="stat-value fs-5" id="fSaldoMin">–</div><div class="small text-muted" id="fSaldoMinSub"></div></div></div>
+        <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Anticipo</div><div class="stat-value fs-5" id="fAnticipo">–</div></div></div>
+        <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Estimaciones</div><div class="stat-value fs-5" id="fEstimaciones">–</div></div></div>
+        <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Costo programado</div><div class="stat-value fs-5" id="fCosto">–</div><div class="small text-muted" id="fCostoSub"></div></div></div>
+        <div class="col-6 col-xl-3"><div class="stat-card"><div class="stat-label">Saldo mínimo programado</div><div class="stat-value fs-5" id="fSaldoMin">–</div><div class="small text-muted" id="fSaldoMinSub"></div></div></div>
       </div>
       <div class="card mb-3">
         <div class="card-titulo"><div><h3>Saldo de caja de la obra</h3><p>Programado (anticipo y estimaciones contra costos del programa) y real (control de obra)</p></div></div>
         <div class="p-3"><div class="grafica" id="gFlujo"></div></div>
       </div>
-      <h6>Flujo de efectivo</h6>
-      <div class="card mb-3"><div class="table-responsive tabla-alta">
-        <table class="table table-sm mb-0 tabla-semanas">
-          <thead>
-            <tr><th rowspan="2">Semana</th><th colspan="7" class="grupo">Programado</th><th colspan="3" class="grupo">Real</th></tr>
-            <tr><th class="num">Ingresos</th><th class="num">Materiales</th><th class="num">Mano de obra</th><th class="num">Equipo</th><th class="num">Indirectos</th><th class="num">Egresos</th><th class="num">Saldo</th>
-              <th class="num">Ingresos</th><th class="num">Egresos</th><th class="num">Saldo</th></tr>
-          </thead>
-          <tbody id="tablaFlujo"></tbody>
-        </table>
-      </div></div>
-      <h6>Programa de compra de material</h6>
-      <p class="text-muted small mb-2">Cantidades necesarias por semana según el programa de obra; conviene comprarlas antes de iniciar cada semana.</p>
-      <div class="card mb-3"><div class="table-responsive">
-        <table class="table table-sm mb-0 tabla-semanas" id="tablaCompras"></table>
-      </div></div>
-      <h6>Mano de obra por semana</h6>
-      <div class="card mb-3"><div class="table-responsive">
-        <table class="table table-sm mb-0 tabla-semanas" id="tablaManoObra"></table>
-      </div></div>
-      <p class="text-muted small">Importes sin IVA. El anticipo entra la semana de inicio y las estimaciones se reparten en partes iguales a lo largo del programa.</p>
+<div class="card">
+        <div class="filtros">
+          <div class="nav chips" role="tablist">
+            <button class="chip active" data-bs-toggle="pill" data-bs-target="#subFlujo" type="button">Flujo de efectivo</button>
+            <button class="chip" data-bs-toggle="pill" data-bs-target="#subCompras" type="button">Compra de material</button>
+            <button class="chip" data-bs-toggle="pill" data-bs-target="#subManoObra" type="button">Mano de obra</button>
+          </div>
+        </div>
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="subFlujo">
+            <div class="table-responsive tabla-alta">
+              <table class="table table-sm mb-0 tabla-semanas">
+                <thead>
+                  <tr><th rowspan="2">Semana</th><th colspan="7" class="grupo">Programado</th><th colspan="3" class="grupo">Real</th></tr>
+                  <tr><th class="num">Ingresos</th><th class="num">Materiales</th><th class="num">Mano de obra</th><th class="num">Equipo</th><th class="num">Indirectos</th><th class="num">Egresos</th><th class="num">Saldo</th>
+                    <th class="num">Ingresos</th><th class="num">Egresos</th><th class="num">Saldo</th></tr>
+                </thead>
+                <tbody id="tablaFlujo"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="subCompras">
+            <p class="text-muted small px-3 pt-2 mb-2">Cantidades necesarias por semana según el programa de obra; conviene comprarlas antes de iniciar cada semana.</p>
+            <div class="table-responsive tabla-alta">
+              <table class="table table-sm mb-0 tabla-semanas" id="tablaCompras"></table>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="subManoObra">
+            <div class="table-responsive tabla-alta">
+              <table class="table table-sm mb-0 tabla-semanas" id="tablaManoObra"></table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="text-muted small mt-2">Importes sin IVA. El anticipo entra la semana de inicio y las estimaciones se reparten en partes iguales a lo largo del programa.</p>
     </div>
   </div>
 </div>
@@ -386,7 +441,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('btnNuevaEstimacion').addEventListener('click', nuevaEstimacion);
     document.getElementById('navEstimaciones').addEventListener('shown.bs.tab', cargarEstimaciones);
     document.getElementById('navControl').addEventListener('shown.bs.tab', cargarControl);
+    document.getElementById('catMov').addEventListener('change', () => { movMostrar = MOV_POR_PAGINA; pintarMovimientos(); });
+    document.getElementById('buscarMov').addEventListener('input', debounce(() => { movMostrar = MOV_POR_PAGINA; pintarMovimientos(); }, 200));
+    document.getElementById('btnMasMov').addEventListener('click', () => { movMostrar += MOV_POR_PAGINA; pintarMovimientos(); });
     document.getElementById('navAvance').addEventListener('shown.bs.tab', cargarAvance);
+    document.getElementById('navExplosion').addEventListener('shown.bs.tab', graficasExplosion);
+    document.getElementById('buscarExplosion').addEventListener('input', debounce(renderExplosion, 200));
     document.getElementById('navFlujo').addEventListener('shown.bs.tab', cargarFlujo);
     modalAvance = new bootstrap.Modal(document.getElementById('modalAvance'));
     document.getElementById('formAvance').addEventListener('submit', guardarAvance);
@@ -497,27 +557,68 @@ function renderCatalogo() {
     });
 }
 
+const NOMBRE_TIPO = { MAT: 'Materiales', MO: 'Mano de obra', EQ: 'Equipo' };
+let tipoExplosion = '';
+
+/** Explosión de insumos: filtros por tipo con su importe, buscador y tabla con altura fija. */
 function renderExplosion() {
-    const tb = document.getElementById('tablaExplosion');
-    tb.innerHTML = '';
-    if (!cot.explosion.length) {
-        tb.innerHTML = '<tr><td colspan="7" class="text-muted">Sin insumos en los análisis</td></tr>';
-        return;
-    }
-    const nombres = { MAT: 'Materiales', MO: 'Mano de obra', EQ: 'Equipo' };
-    let total = 0;
-    ['MAT', 'MO', 'EQ'].forEach((tipo) => {
-        const filas = cot.explosion.filter((e) => e.tipo === tipo);
-        if (!filas.length) return;
-        const sub = filas.reduce((s, e) => s + e.importe, 0);
-        total += sub;
-        filas.forEach((e) => {
-            tb.insertAdjacentHTML('beforeend', `<tr><td class="text-nowrap">${esc(e.clave)}</td><td>${esc(e.descripcion)}</td><td><span class="badge tipo-${tipo}">${tipo}</span></td>
-                <td>${esc(e.unidad)}</td><td class="num">${numero(e.cantidad, 4)}</td><td class="num">${money(e.precio)}</td><td class="num">${money(e.importe)}</td></tr>`);
-        });
-        tb.insertAdjacentHTML('beforeend', `<tr class="table-light"><td colspan="6" class="text-end fw-semibold">Total ${nombres[tipo]}</td><td class="num fw-semibold">${money(sub)}</td></tr>`);
+    const todos = cot.explosion;
+    document.getElementById('graficasExplosion').classList.toggle('d-none', !todos.length);
+    const chips = document.getElementById('chipsExplosion');
+    chips.innerHTML = '';
+    [['', 'Todos'], ['MAT', 'Materiales'], ['MO', 'Mano de obra'], ['EQ', 'Equipo']].forEach(([tipo, nombre]) => {
+        const filas = todos.filter((e) => !tipo || e.tipo === tipo);
+        if (tipo && !filas.length) return;
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip' + (tipo === tipoExplosion ? ' active' : '');
+        b.innerHTML = `${nombre} <span class="cuenta">${moneyCorto(filas.reduce((s, e) => s + e.importe, 0))}</span>`;
+        b.addEventListener('click', () => { tipoExplosion = tipo; renderExplosion(); });
+        chips.appendChild(b);
     });
-    tb.insertAdjacentHTML('beforeend', `<tr><td colspan="6" class="text-end fw-bold">Total insumos</td><td class="num fw-bold">${money(total)}</td></tr>`);
+
+    const q = document.getElementById('buscarExplosion').value.trim().toLowerCase();
+    const orden = { MAT: 0, MO: 1, EQ: 2 };
+    const filas = todos.filter((e) => (!tipoExplosion || e.tipo === tipoExplosion)
+        && (!q || e.clave.toLowerCase().includes(q) || e.descripcion.toLowerCase().includes(q)))
+        .sort((a, b) => orden[a.tipo] - orden[b.tipo] || a.clave.localeCompare(b.clave));
+    document.getElementById('tablaExplosion').innerHTML = filas.map((e) => `<tr><td class="text-nowrap fw-semibold">${esc(e.clave)}</td><td>${esc(e.descripcion)}</td>
+        <td><span class="badge tipo-${e.tipo}">${e.tipo}</span></td><td>${esc(e.unidad)}</td><td class="num">${numero(e.cantidad, 4)}</td>
+        <td class="num">${money(e.precio)}</td><td class="num fw-semibold">${money(e.importe)}</td></tr>`).join('')
+        || `<tr><td colspan="7" class="vacio-tabla"><i class="bi bi-box-seam"></i>${todos.length ? 'Sin resultados' : 'Sin insumos en los análisis'}</td></tr>`;
+    document.getElementById('explosionCuenta').textContent = `${filas.length} insumo(s)`;
+    document.getElementById('explosionTotal').textContent = filas.length ? 'Total ' + money(filas.reduce((s, e) => s + e.importe, 0)) : '';
+    if (document.getElementById('tabExplosion').classList.contains('active')) graficasExplosion();
+}
+
+/** Se dibujan con la pestaña visible (una gráfica en una pestaña oculta no tiene tamaño). */
+function graficasExplosion() {
+    const todos = cot.explosion;
+    if (!todos.length) return;
+    const total = todos.reduce((s, e) => s + e.importe, 0);
+    const colores = { MAT: COLORES.brand, MO: COLORES.warning, EQ: COLORES.purple };
+    const importeDe = (tipo) => todos.filter((e) => e.tipo === tipo).reduce((s, e) => s + e.importe, 0);
+    grafica('gComposicion', {
+        tooltip: { trigger: 'item', backgroundColor: COLORES.navy, borderWidth: 0, textStyle: { color: '#fff', fontSize: 12 },
+            formatter: (p) => `${p.name}: ${money(p.value)} (${p.percent}%)` },
+        legend: { right: 0, top: 'middle', orient: 'vertical', icon: 'circle', itemWidth: 9, textStyle: { color: COLORES.texto, fontSize: 12 },
+            formatter: (n) => `${n}  ${pct(importeDe(Object.keys(NOMBRE_TIPO).find((k) => NOMBRE_TIPO[k] === n)) / total)}` },
+        series: [{ type: 'pie', radius: ['50%', '78%'], center: ['30%', '50%'], label: { show: false }, itemStyle: { borderColor: '#fff', borderWidth: 2 },
+            data: ['MAT', 'MO', 'EQ'].map((k) => ({ name: NOMBRE_TIPO[k], value: importeDe(k), itemStyle: { color: colores[k] } })).filter((d) => d.value > 0) }],
+    });
+    const top = [...todos].sort((a, b) => b.importe - a.importe).slice(0, 8);
+    const pesoTop = top.reduce((s, e) => s + e.importe, 0);
+    document.getElementById('paretoSub').textContent = `Estos ${top.length} suman ${pct(pesoTop / total)} del costo de insumos`;
+    grafica('gPareto', {
+        grid: { left: 4, right: 16, top: 4, bottom: 4, containLabel: true },
+        legend: { show: false },
+        tooltip: { trigger: 'item', backgroundColor: COLORES.navy, borderWidth: 0, textStyle: { color: '#fff', fontSize: 12 },
+            formatter: (p) => `${esc(top[p.dataIndex].clave)} · ${esc(top[p.dataIndex].descripcion)}<br>${money(p.value)}` },
+        xAxis: { ...ejeMontos(), splitNumber: 3 },
+        yAxis: { type: 'category', inverse: true, data: top.map((e) => (e.descripcion.length > 28 ? e.descripcion.slice(0, 27) + '…' : e.descripcion)),
+            axisTick: { show: false }, axisLine: { show: false }, axisLabel: { color: COLORES.texto, fontSize: 11 } },
+        series: [{ type: 'bar', barMaxWidth: 14, data: top.map((e) => ({ value: e.importe, itemStyle: { color: colores[e.tipo], borderRadius: [0, 3, 3, 0] } })) }],
+    });
 }
 
 function addDays(iso, n) {
@@ -883,22 +984,59 @@ async function cargarControl() {
     selC.length = 1;
     k.conceptos.forEach((c) => selC.insertAdjacentHTML('beforeend', `<option value="${c.id}">${esc(c.clave)} ${esc(String(c.descripcion).slice(0, 60))}</option>`));
 
+    const cats = [...new Set(k.movimientos.map((m) => m.categoria))];
+    const selCat = document.getElementById('catMov');
+    const actual = selCat.value;
+    selCat.length = 1;
+    cats.forEach((c) => selCat.insertAdjacentHTML('beforeend', `<option value="${c}">${NOMBRE_CATEGORIA[c] || esc(c)}</option>`));
+    selCat.value = cats.includes(actual) ? actual : '';
+    pintarMovimientos();
+}
+
+const MOV_POR_PAGINA = 30;
+let tipoMov = '';
+let movMostrar = MOV_POR_PAGINA;
+
+/** Movimientos de la hoja CONTROL: filtro por tipo, categoría y texto; se muestran de 30 en 30. */
+function pintarMovimientos() {
+    const todos = control.movimientos;
+    const chips = document.getElementById('chipsMov');
+    chips.innerHTML = '';
+    [['', 'Todos'], ['egreso', 'Egresos'], ['ingreso', 'Ingresos']].forEach(([tipo, nombre]) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip' + (tipo === tipoMov ? ' active' : '');
+        b.innerHTML = `${nombre} <span class="cuenta">${todos.filter((m) => !tipo || m.tipo === tipo).length}</span>`;
+        b.addEventListener('click', () => { tipoMov = tipo; movMostrar = MOV_POR_PAGINA; pintarMovimientos(); });
+        chips.appendChild(b);
+    });
+
+    const cat = document.getElementById('catMov').value;
+    const q = document.getElementById('buscarMov').value.trim().toLowerCase();
+    const lista = todos.filter((m) => (!tipoMov || m.tipo === tipoMov) && (!cat || m.categoria === cat)
+        && (!q || [m.descripcion, m.proveedor, m.rfc].some((v) => String(v || '').toLowerCase().includes(q))));
+
     const tb = document.getElementById('tablaMovimientos');
-    tb.innerHTML = k.movimientos.length ? '' : '<tr><td colspan="7" class="text-muted">Sin movimientos</td></tr>';
-    k.movimientos.forEach((m) => {
+    tb.innerHTML = lista.length ? '' : `<tr><td colspan="7" class="vacio-tabla"><i class="bi bi-cash-stack"></i>${todos.length ? 'Sin resultados' : 'Sin movimientos'}</td></tr>`;
+    lista.slice(0, movMostrar).forEach((m) => {
         const tr = document.createElement('tr');
-        tr.style.cursor = 'pointer';
+        tr.className = 'fila-click';
         const ingreso = m.tipo === 'ingreso';
-        tr.innerHTML = `<td>${fecha(m.fecha)}</td><td><span class="badge ${ingreso ? 'bg-success-subtle text-success-emphasis' : 'bg-danger-subtle text-danger-emphasis'}">${m.tipo}</span></td>
+        tr.innerHTML = `<td class="text-nowrap">${fecha(m.fecha)}</td><td><span class="badge ${ingreso ? 'bg-success-subtle text-success-emphasis' : 'bg-danger-subtle text-danger-emphasis'}">${m.tipo}</span></td>
             <td class="small">${NOMBRE_CATEGORIA[m.categoria] || esc(m.categoria)}</td>
             <td>${esc(m.descripcion)}${m.comprobante ? ` <a href="archivos/movimientos/${m.id}" target="_blank" title="Ver comprobante" data-clip><i class="bi bi-paperclip"></i></a>` : ''}</td>
             <td class="small">${esc(m.proveedor)}${m.rfc ? '<br><span class="text-muted">' + esc(m.rfc) + '</span>' : ''}</td>
             <td class="small">${m.partida_clave ? esc(m.partida_clave) + ' ' + esc(m.partida_nombre) : ''}${m.concepto_clave ? `<div class="text-muted">${esc(m.concepto_clave)} ${esc(String(m.concepto_descripcion).slice(0, 40))}</div>` : ''}</td>
-            <td class="num ${ingreso ? 'text-success' : ''}">${ingreso ? '' : '−'}${money(m.monto)}</td>`;
+            <td class="num fw-semibold ${ingreso ? 'text-success' : ''}">${ingreso ? '' : '−'}${money(m.monto)}</td>`;
         tr.addEventListener('click', () => abrirMovimiento(m));
         tr.querySelector('[data-clip]')?.addEventListener('click', (ev) => ev.stopPropagation());
         tb.appendChild(tr);
     });
+    const ing = lista.filter((m) => m.tipo === 'ingreso').reduce((s, m) => s + Number(m.monto), 0);
+    const egr = lista.filter((m) => m.tipo !== 'ingreso').reduce((s, m) => s + Number(m.monto), 0);
+    document.getElementById('movResumen').textContent = lista.length
+        ? `Mostrando ${Math.min(movMostrar, lista.length)} de ${lista.length} · ingresos ${money(ing)} · egresos ${money(egr)}` : '';
+    document.getElementById('btnMasMov').classList.toggle('d-none', lista.length <= movMostrar);
 }
 
 const CATEGORIAS = {
@@ -1051,6 +1189,7 @@ async function cargarAvance() {
         || '<tr><td colspan="7" class="text-muted">Sin programa</td></tr>';
     graficaCurvaS(a.semanas, hoy);
 
+    document.getElementById('cuentaRegistros').textContent = a.registros.length;
     const tr = document.getElementById('tablaRegistros');
     tr.innerHTML = a.registros.length ? '' : '<tr><td colspan="7" class="text-muted">Sin registros de avance</td></tr>';
     a.registros.forEach((r) => {

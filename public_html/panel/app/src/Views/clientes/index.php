@@ -1,16 +1,23 @@
-<div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
-  <div class="input-group" style="max-width:320px">
-    <span class="input-group-text"><i class="bi bi-search"></i></span>
-    <input type="text" id="buscarCliente" class="form-control" placeholder="Buscar cliente...">
-  </div>
-  <button class="btn btn-primary" onclick="nuevoCliente()"><i class="bi bi-plus-lg"></i> Nuevo cliente</button>
+<div class="row g-3 mb-3">
+  <div class="col-6 col-xl-3"><div class="kpi"><span class="kpi-icon tono-brand"><i class="bi bi-people"></i></span>
+    <div class="kpi-body"><div class="kpi-label">Clientes</div><div class="kpi-value" id="kClientes">–</div><div class="kpi-sub" id="kClientesSub"></div></div></div></div>
+  <div class="col-6 col-xl-3"><div class="kpi"><span class="kpi-icon tono-success"><i class="bi bi-briefcase"></i></span>
+    <div class="kpi-body"><div class="kpi-label">Contratado total</div><div class="kpi-value" id="kContratado">–</div><div class="kpi-sub">Cotizaciones aceptadas, con IVA</div></div></div></div>
+  <div class="col-6 col-xl-3"><div class="kpi"><span class="kpi-icon tono-teal"><i class="bi bi-arrow-repeat"></i></span>
+    <div class="kpi-body"><div class="kpi-label">Clientes recurrentes</div><div class="kpi-value" id="kRecurrentes">–</div><div class="kpi-sub">Con más de una obra</div></div></div></div>
+  <div class="col-6 col-xl-3"><div class="kpi"><span class="kpi-icon tono-purple"><i class="bi bi-trophy"></i></span>
+    <div class="kpi-body"><div class="kpi-label">Cliente principal</div><div class="kpi-value text-truncate" id="kPrincipal" style="font-size:1.05rem">–</div><div class="kpi-sub" id="kPrincipalSub"></div></div></div></div>
 </div>
 
 <div class="card">
-  <div class="table-responsive">
+  <div class="filtros">
+    <div class="buscador"><i class="bi bi-search"></i><input type="text" id="buscarCliente" class="form-control" placeholder="Nombre, RFC o contacto…"></div>
+    <button class="btn btn-primary ms-auto" onclick="nuevoCliente()"><i class="bi bi-plus-lg"></i> Nuevo cliente</button>
+  </div>
+  <div class="table-responsive tabla-alta">
   <table class="table mb-0">
-    <thead><tr><th>Nombre</th><th>RFC</th><th>Contacto</th><th>Teléfono</th><th>Correo</th><th></th></tr></thead>
-    <tbody id="tablaClientes"><tr><td colspan="6" class="text-muted">Cargando…</td></tr></tbody>
+    <thead><tr><th>Cliente</th><th>Contacto</th><th class="num">Cotizaciones</th><th class="num">Obras</th><th class="num">Contratado</th><th>Última cotización</th><th></th></tr></thead>
+    <tbody id="tablaClientes"><tr><td colspan="7" class="vacio-tabla">Cargando…</td></tr></tbody>
   </table>
   </div>
 </div>
@@ -53,14 +60,18 @@ async function cargarClientes() {
     const data = await api('api/clientes?q=' + encodeURIComponent(q));
     const tbody = document.getElementById('tablaClientes');
     tbody.innerHTML = '';
+    if (!q) resumenClientes(data);
     if (!data.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-muted">Sin clientes registrados</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="7" class="vacio-tabla"><i class="bi bi-people"></i>${q ? 'Sin resultados' : 'Sin clientes registrados'}</td></tr>`;
         return;
     }
     data.forEach((c) => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${esc(c.nombre)}</td><td>${esc(c.rfc)}</td><td>${esc(c.contacto)}</td><td>${esc(c.telefono)}</td>
-            <td>${esc(c.email)}</td><td class="text-end"></td>`;
+        const contacto = [c.contacto, c.telefono, c.email].filter(Boolean).map(esc).join(' · ');
+        tr.innerHTML = `<td><div class="fw-semibold">${esc(c.nombre)}</div>${c.rfc ? `<div class="small text-muted">${esc(c.rfc)}</div>` : ''}</td>
+            <td class="small">${contacto || '<span class="text-muted">—</span>'}</td>
+            <td class="num">${c.cotizaciones}</td><td class="num">${Number(c.obras) || 0}</td><td class="num fw-semibold">${Number(c.contratado) ? money(c.contratado) : '—'}</td>
+            <td class="text-nowrap">${c.ultima ? fecha(c.ultima) : '<span class="text-muted">—</span>'}</td><td class="text-end"></td>`;
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'btn btn-sm btn-outline-secondary';
@@ -69,6 +80,18 @@ async function cargarClientes() {
         tr.lastElementChild.appendChild(btn);
         tbody.appendChild(tr);
     });
+}
+
+/** Indicadores de la cartera de clientes (sobre la lista completa, no la búsqueda). */
+function resumenClientes(data) {
+    const contratado = data.reduce((s, c) => s + Number(c.contratado), 0);
+    document.getElementById('kClientes').textContent = data.length;
+    document.getElementById('kClientesSub').textContent = `${data.filter((c) => Number(c.obras) > 0).length} con obra contratada`;
+    document.getElementById('kContratado').textContent = moneyEntero(contratado);
+    document.getElementById('kRecurrentes').textContent = data.filter((c) => Number(c.obras) > 1).length;
+    const top = [...data].sort((a, b) => b.contratado - a.contratado)[0];
+    document.getElementById('kPrincipal').textContent = top && Number(top.contratado) ? top.nombre : '—';
+    document.getElementById('kPrincipalSub').textContent = top && Number(top.contratado) && contratado ? `${pct(top.contratado / contratado)} de lo contratado` : 'Sin obras contratadas';
 }
 
 function nuevoCliente() {

@@ -23,12 +23,20 @@ class ClientesController
         $db = Database::pdo();
         $q = trim($_GET['q'] ?? '');
 
+        // Con cuántas cotizaciones y obras cuenta cada cliente y cuánto le hemos contratado.
+        $sql = "SELECT cl.*, COALESCE(c.cotizaciones, 0) AS cotizaciones, COALESCE(c.obras, 0) AS obras,
+                       COALESCE(c.contratado, 0) AS contratado, c.ultima
+                FROM clientes cl LEFT JOIN (
+                    SELECT cliente_id, COUNT(*) AS cotizaciones, SUM(estado = 'aceptada') AS obras,
+                           SUM(CASE WHEN estado = 'aceptada' THEN total ELSE 0 END) AS contratado, MAX(fecha_cotizacion) AS ultima
+                    FROM cotizaciones GROUP BY cliente_id
+                ) c ON c.cliente_id = cl.id";
         if ($q !== '') {
-            $stmt = $db->prepare('SELECT * FROM clientes WHERE nombre LIKE ? OR rfc LIKE ? OR contacto LIKE ? ORDER BY nombre');
+            $stmt = $db->prepare("$sql WHERE cl.nombre LIKE ? OR cl.rfc LIKE ? OR cl.contacto LIKE ? ORDER BY cl.nombre");
             $like = "%$q%";
             $stmt->execute([$like, $like, $like]);
         } else {
-            $stmt = $db->query('SELECT * FROM clientes ORDER BY nombre');
+            $stmt = $db->query("$sql ORDER BY cl.nombre");
         }
 
         Response::json($stmt->fetchAll());

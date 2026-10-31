@@ -890,3 +890,14 @@ button.kpi { font: inherit; }
 .tabla-alta { max-height: 440px; overflow: auto; }
 .tabla-alta thead th { position: sticky; top: 0; z-index: 2; }
 button.kpi:hover { border-color: var(--brand-200); }
+
+.badge.rol-Admin { background: #e8eef6; color: var(--navy-800); }
+.badge.rol-Cotizador { background: var(--brand-50); color: var(--brand-700); }
+.badge.rol-Ingeniero { background: var(--warning-50); color: var(--warning-700); }
+.stat-value { overflow-wrap: anywhere; }
+
+@media (max-width: 575.98px) {
+    .stat-card { padding: .75rem .85rem; }
+    .stat-card .stat-value, .stat-card .fs-4, .stat-card .fs-5 { font-size: 1.1rem !important; }
+    .page-header { margin-bottom: .75rem; }
+}

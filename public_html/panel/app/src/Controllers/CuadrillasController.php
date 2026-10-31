@@ -13,7 +13,7 @@ class CuadrillasController
     public function index(): void
     {
         Auth::requireLogin();
-        Response::view('cuadrillas/index', ['user' => Auth::user(), 'titulo' => 'Cuadrillas', 'subtitulo' => 'Integrantes y salario de cada cuadrilla; el costo por jornada incluye prestaciones e impuestos']);
+        Response::view('cuadrillas/index', ['user' => Auth::user(), 'titulo' => 'Cuadrillas', 'subtitulo' => 'Integrantes y salario de cada cuadrilla. El costo por jornada incluye nómina, aguinaldo, prima vacacional, impuesto sobre nómina y cuotas patronales']);
     }
 
     public function apiIndex(): void

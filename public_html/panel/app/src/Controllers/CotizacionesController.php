@@ -40,6 +40,7 @@ class CotizacionesController
             'migas' => [(Auth::esIngeniero() ? 'Obras' : 'Cotizaciones') => 'cotizaciones'],
             'cotizacionId' => (int) $id,
             'graficas' => true,
+            'sinTitulo' => true,
         ]);
     }
 

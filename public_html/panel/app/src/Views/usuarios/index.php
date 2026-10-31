@@ -1,13 +1,31 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <p class="text-muted small mb-0"><strong>Admin</strong>: todo, incluida configuración y eliminaciones. <strong>Cotizador</strong>: cotizaciones, estimaciones, control de obra y catálogos. <strong>Ingeniero</strong>: residente de obra; ve las obras aceptadas y registra avance y gastos con fotos (web y app).</p>
-  <button class="btn btn-primary" onclick="nuevo()"><i class="bi bi-plus-lg"></i> Nuevo usuario</button>
+<div class="row g-3 mb-3">
+  <?php foreach ([
+      ['Admin', 'shield-lock', 'tono-navy', 'Todo el sistema, incluida configuración, usuarios y eliminaciones.'],
+      ['Cotizador', 'calculator', 'tono-brand', 'Cotizaciones, estimaciones, control de obra y catálogos.'],
+      ['Ingeniero', 'cone-striped', 'tono-warning', 'Residente de obra: ve las obras aceptadas y registra avance y gastos con fotos, en la web y la app.'],
+  ] as [$rol, $icono, $tono, $texto]): ?>
+  <div class="col-md-4">
+    <div class="kpi">
+      <span class="kpi-icon <?= $tono ?>"><i class="bi bi-<?= $icono ?>"></i></span>
+      <div class="kpi-body">
+        <div class="kpi-label"><?= $rol ?></div>
+        <div class="kpi-value" data-rol="<?= $rol ?>">–</div>
+        <div class="kpi-sub"><?= $texto ?></div>
+      </div>
+    </div>
+  </div>
+  <?php endforeach; ?>
 </div>
 
 <div class="card">
+  <div class="card-titulo">
+    <div><h3>Usuarios</h3><p>Un usuario desactivado pierde la sesión de inmediato, también en la app.</p></div>
+    <button class="btn btn-primary" onclick="nuevo()"><i class="bi bi-plus-lg"></i> Nuevo usuario</button>
+  </div>
   <div class="table-responsive">
   <table class="table mb-0">
     <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th></th></tr></thead>
-    <tbody id="tabla"><tr><td colspan="5" class="text-muted">Cargando…</td></tr></tbody>
+    <tbody id="tabla"><tr><td colspan="5" class="vacio-tabla">Cargando…</td></tr></tbody>
   </table>
   </div>
 </div>
@@ -46,9 +64,15 @@ async function cargar() {
     sel.innerHTML = d.roles.map((r) => `<option value="${r.id}">${esc(r.nombre)}</option>`).join('');
     const tb = document.getElementById('tabla');
     tb.innerHTML = '';
+    document.querySelectorAll('[data-rol]').forEach((el) => {
+        const activos = d.usuarios.filter((u) => u.rol_nombre === el.dataset.rol && Number(u.activo)).length;
+        el.textContent = `${activos} usuario${activos === 1 ? '' : 's'}`;
+    });
     d.usuarios.forEach((u) => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${esc(u.nombre)}</td><td>${esc(u.email)}</td><td>${esc(u.rol_nombre)}</td>
+        const iniciales = u.nombre.trim().split(/\s+/).slice(0, 2).map((p) => p[0].toUpperCase()).join('');
+        tr.innerHTML = `<td><div class="d-flex align-items-center gap-2"><span class="avatar" style="width:32px;height:32px;font-size:.72rem">${esc(iniciales)}</span><span class="fw-semibold">${esc(u.nombre)}</span></div></td>
+            <td class="text-muted">${esc(u.email)}</td><td><span class="badge rol-${esc(u.rol_nombre)}">${esc(u.rol_nombre)}</span></td>
             <td>${Number(u.activo) ? '<span class="badge bg-success-subtle text-success-emphasis">Activo</span>' : '<span class="badge bg-secondary-subtle text-secondary-emphasis">Inactivo</span>'}</td>
             <td class="text-end"><button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></button></td>`;
         tr.querySelector('button').addEventListener('click', () => editar(u));

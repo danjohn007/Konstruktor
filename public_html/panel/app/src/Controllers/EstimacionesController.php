@@ -28,6 +28,7 @@ class EstimacionesController
             'titulo' => 'Estimación ' . $est['numero'] . ' · ' . $est['cotizacion']['folio'],
             'migas' => ['Cotizaciones' => 'cotizaciones', $est['cotizacion']['folio'] => 'cotizaciones/' . (int) $est['cotizacion']['id']],
             'estimacionId' => (int) $id,
+            'sinTitulo' => true,
         ]);
     }
 

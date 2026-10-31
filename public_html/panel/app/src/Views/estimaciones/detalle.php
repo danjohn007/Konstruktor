@@ -1,7 +1,7 @@
 <div class="d-flex flex-wrap gap-2 justify-content-between align-items-start mb-3">
   <div>
-    <div class="fs-5 fw-semibold" id="hObra"></div>
-    <div class="text-muted small" id="hSub"></div>
+    <h1 class="page-title" id="hObra"></h1>
+    <div class="page-subtitle" id="hSub"></div>
   </div>
   <div class="d-flex flex-wrap gap-2">
     <a class="btn btn-outline-secondary" id="lnkCotizacion"><i class="bi bi-arrow-left"></i> Cotización</a>

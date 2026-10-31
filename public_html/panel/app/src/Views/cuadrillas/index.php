@@ -1,5 +1,5 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <p class="text-muted mb-0 small">El costo por jornada incluye nómina, aguinaldo, prima vacacional, impuesto sobre nómina y cuotas patronales (tasas en Configuración).</p>
+  <p class="text-muted mb-0 small"><i class="bi bi-info-circle"></i> Las tasas (IMSS, INFONAVIT, ISN, aguinaldo…) se ajustan en <a href="configuracion">Configuración</a>.</p>
   <button class="btn btn-primary" onclick="nueva()"><i class="bi bi-plus-lg"></i> Nueva cuadrilla</button>
 </div>
 

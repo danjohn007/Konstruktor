@@ -115,8 +115,10 @@ $sidebarFoot = ob_get_clean();
           <span><?= $h($titulo ?? '') ?></span>
         </nav>
         <?php endif; ?>
+        <?php if (empty($sinTitulo)): // las pantallas de detalle ponen su propio encabezado (nombre de la obra y acciones) ?>
         <h1 class="page-title"><?= $h($titulo ?? '') ?></h1>
         <?php if (!empty($subtitulo)): ?><p class="page-subtitle"><?= $h($subtitulo) ?></p><?php endif; ?>
+        <?php endif; ?>
       </div>
     </div>
     <?php require $contentFile; ?>
