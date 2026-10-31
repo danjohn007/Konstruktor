@@ -1,4 +1,24 @@
+# Archivos de trabajo con datos de clientes y precios: no van al repositorio (es público)
+*.xlsx
+*.xltx
+*.pdf
 *.zip
+
+# Sistema web: conexión del hosting y archivos subidos
+/public_html/panel/app/config.local.php
+/public_html/panel/app/vendor/
+/public_html/panel/app/storage/uploads/*
+!/public_html/panel/app/storage/uploads/.gitkeep
+
+# App móvil
+node_modules/
+.expo/
+dist/
+web-build/
+
+.env
+*.log
+.claude/
 .DS_Store
 Thumbs.db
 desktop.ini

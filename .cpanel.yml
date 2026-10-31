@@ -1,10 +1,9 @@
 # Despliegue con cPanel › Git™ Version Control › "Deploy HEAD Commit".
-# Copia la landing a public_html. Si es un subdominio o addon, cambia DEPLOYPATH
-# (por ejemplo: $HOME/konstruktor.mx/).
+# Copia el contenido de public_html/ (landing + sistema en panel/) a public_html del hosting.
+# No borra nada: la conexión a la base (panel/app/config.local.php) y las fotos subidas se conservan.
 ---
 deployment:
   tasks:
     - export DEPLOYPATH=$HOME/public_html/
-    - /bin/mkdir -p $DEPLOYPATH/assets
-    - /bin/cp index.html 404.html robots.txt .htaccess $DEPLOYPATH
-    - /bin/cp -R assets/. $DEPLOYPATH/assets/
+    - /bin/cp -R public_html/. $DEPLOYPATH
+    - if [ -f $DEPLOYPATH/panel/app/config.local.php ]; then /bin/rm -f $DEPLOYPATH/panel/seed_web.php; fi

@@ -1,62 +1,69 @@
-# Konstruktor · Landing page
+# Konstruktor
 
-Página de ventas de Konstruktor, constructora con presupuesto por precio unitario, programa de obra,
-reporte fotográfico diario y pagos por avance real.
-
-Es HTML estático: no necesita PHP, base de datos ni compilación. El formulario de cotización abre
-WhatsApp con los datos de la obra ya escritos.
-
-## Archivos
-
-| Archivo | Qué es |
+| Carpeta | Qué es |
 |---|---|
-| `index.html` | La landing completa (estilos y scripts incluidos) |
-| `404.html` | Página de error para rutas que no existen |
-| `assets/` | Logo y favicon |
-| `.htaccess` | HTTPS forzado, caché, compresión y bloqueo de archivos internos |
-| `robots.txt` | Permite que Google indexe el sitio |
-| `.cpanel.yml` | Instrucciones de despliegue para cPanel › Git Version Control |
+| `public_html/` | Lo que se sube al hosting: la landing (`index.html`) y el sistema de cotización y control de obra (`panel/`) |
+| `app-movil/` | App para celular (Expo / React Native) que usa la API del sistema |
+| `herramientas/` | Script para importar obras del Excel 2024 (se corre en la computadora) |
+| `docs/` | Documentación de la landing y del sistema web |
 
-## Antes de publicar: datos de contacto
+Una vez subido:
 
-Al final de `index.html` está el objeto `CONFIG`. Cambia esos valores y se actualizan en toda la página:
+- **Landing:** `https://konstruktor.com.mx`
+- **Sistema:** `https://konstruktor.com.mx/panel`
 
-```js
-const CONFIG = {
-    whatsapp: '520000000000',              // 52 + 10 dígitos, sin espacios ni +
-    telefono: '00 0000 0000',              // como se muestra en la página
-    email: 'contacto@konstruktor.mx',
-    zona: 'tu ciudad y zona metropolitana',
-    mensajeWhatsApp: 'Hola Konstruktor, quiero cotizar una obra.'
-};
-```
+## Instalar en cPanel
 
-`whatsapp` también se usa para el botón "Llámanos".
+Pasos 1 y 4 solo se hacen la primera vez.
 
-## Subir a cPanel
+1. **Base de datos.** En cPanel › **Bases de datos MySQL**:
+   - crea una base (p. ej. `konstruktor`);
+   - crea un usuario con contraseña;
+   - en *Agregar usuario a la base de datos*, dale **TODOS LOS PRIVILEGIOS**.
 
-### Opción A: Administrador de archivos (la más rápida)
+   Anota los tres datos. cPanel les pone tu usuario delante, por ejemplo `konstruktorcom_konstruktor`.
+2. **Descargar.** En GitHub, **Code › Download ZIP**.
+3. **Subir y abrir.** En cPanel › **Administrador de archivos**:
+   1. Entra a `public_html`, **Cargar** el ZIP y luego clic derecho › **Extraer**.
+   2. Entra a `Konstruktor-main/public_html/` y elige **Seleccionar todo** › **Mover**. Escribe `/public_html` como destino.
+   3. Borra la carpeta `Konstruktor-main` y el ZIP.
 
-1. Descarga el ZIP del repositorio: **Code › Download ZIP** en GitHub.
-2. En cPanel abre **Administrador de archivos** › `public_html` (o la carpeta del dominio).
-3. **Cargar** el ZIP y luego clic derecho › **Extraer**.
-4. Si quedó dentro de una subcarpeta (`Konstruktor-main/`), entra a ella, **Seleccionar todo** › **Mover** a `public_html`.
-5. En **Configuración** (arriba a la derecha) activa **Mostrar archivos ocultos** y confirma que `.htaccess` quedó en `public_html`.
+   Antes de mover, activa *Configuración › Mostrar archivos ocultos*: los `.htaccess` también tienen que pasar.
+4. **Instalador.** Abre `https://konstruktor.com.mx/panel`. Te lleva solo al instalador. Ahí escribe:
+   - los datos de la base del paso 1 (en *Servidor* deja `localhost`);
+   - el correo y la contraseña con que vas a entrar.
 
-### Opción B: Git Version Control (actualizaciones con un clic)
+   Pulsa **Instalar**. Esto crea las tablas, carga el catálogo de insumos, crea tu usuario administrador y se borra solo.
+5. **Entrar** en `https://konstruktor.com.mx/panel/login`.
 
-1. En cPanel abre **Git™ Version Control** › **Create**.
-2. Activa **Clone a Repository** y pega `https://github.com/danjohn007/Konstruktor.git`.
-3. En **Repository Path** pon una carpeta fuera de `public_html`, por ejemplo `repositories/Konstruktor`.
-4. **Create**. Luego en **Manage** › **Pull or Deploy** › **Deploy HEAD Commit**.
+Este correo y contraseña también sirven en la app. En la app el servidor es `https://konstruktor.com.mx/panel`.
 
-`.cpanel.yml` copia la página a `public_html`. Si el sitio va en un subdominio o dominio adicional,
-cambia `DEPLOYPATH` en ese archivo antes de desplegar. Para publicar cambios: sube a GitHub, y en cPanel
-**Update from Remote** › **Deploy HEAD Commit**.
+### Actualizar
 
-## Después de subir
+Repite los pasos 2 y 3. Cuando pregunte, elige sobrescribir.
 
-- Abre el dominio con `https://`. Si cPanel aún no tiene certificado (**SSL/TLS Status** › **Run AutoSSL**),
-  comenta en `.htaccess` las 3 líneas de "Forzar HTTPS" mientras tanto.
-- Prueba el formulario: debe abrir WhatsApp con el número de `CONFIG.whatsapp`.
-- Si ya hay otro sitio en `public_html`, respáldalo antes: estos archivos reemplazan `index.html` y `.htaccess`.
+- La conexión a la base y las fotos subidas no vienen en el ZIP, así que se conservan.
+- Los cambios a la base de datos se aplican solos en la primera visita.
+- Si el instalador vuelve a aparecer en el servidor, no hace nada: el sistema ya está instalado y se borra solo al abrirlo.
+
+### Otra opción: Git Version Control
+
+Con esta opción las actualizaciones son de un clic:
+
+1. En cPanel › **Git™ Version Control** › **Create**.
+2. Clona `https://github.com/danjohn007/Konstruktor.git` en una carpeta fuera de `public_html`, p. ej. `repositories/Konstruktor`.
+3. En **Manage** › **Pull or Deploy** › **Deploy HEAD Commit**. `.cpanel.yml` copia `public_html/` del repositorio a tu `public_html`.
+4. Sigue con el paso 4 de arriba.
+
+Para actualizar: **Update from Remote** › **Deploy HEAD Commit**.
+
+## Requisitos del hosting
+
+- **PHP 8.2 o más** (cPanel › *Select PHP Version*).
+- **MySQL o MariaDB.**
+- **SSL activo** (cPanel › *SSL/TLS Status* › *Run AutoSSL*): la landing y el sistema fuerzan HTTPS.
+- **Para fotos de obra:** en *Select PHP Version › Options*, sube `upload_max_filesize` y `post_max_size` a `10M`.
+
+Los Excel, PDF y ZIP de trabajo no se suben al repositorio (está en `.gitignore`), porque el repositorio es público.
+
+Más detalle en [docs/sistema-web.md](docs/sistema-web.md), [docs/landing.md](docs/landing.md) y [app-movil/README.md](app-movil/README.md).

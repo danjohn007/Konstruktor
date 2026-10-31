@@ -1,0 +1,11 @@
+# Bloquea el acceso directo por navegador a todo lo de esta carpeta
+# (config.php, código fuente, base de datos, documentos subidos).
+# El PHP de public_html/index.php sigue pudiendo leer estos archivos
+# normalmente; esto solo bloquea peticiones HTTP directas.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>
