@@ -214,3 +214,22 @@ Sin `DELIMITER`, procedimientos ni triggers: cada sentencia termina en `;` al fi
   - Una vista las pide con `'graficas' => true`.
   - Se dibujan con `grafica(id, opciones)` de `assets/js/app.js`, que ya trae la paleta, los ejes en pesos (`ejeMontos()`) y el redibujado al cambiar de tamaño.
 - **Scripts de las vistas:** `app.js` carga **después** del contenido. Un script de vista no puede usar sus constantes (`COLORES`…) fuera de `DOMContentLoaded`, ni declarar funciones con el mismo nombre.
+
+## Datos de prueba
+
+La migración `006_datos_prueba.php` carga datos para revisar el sistema con cada rol. Se aplica sola, igual que las demás migraciones.
+
+| Correo | Rol | Contraseña |
+|---|---|---|
+| `admin@demo.konstruktor.mx` | Admin | `Demo2026!` |
+| `cotizador@demo.konstruktor.mx` | Cotizador | `Demo2026!` |
+| `ingeniero@demo.konstruktor.mx` | Ingeniero | `Demo2026!` |
+
+- **Clientes:** 3 clientes de prueba.
+- **Cotizaciones:** DEMO-01 a DEMO-05, en todos los estados.
+- **Obras en ejecución:** DEMO-01 (atrasada) y DEMO-05 (al corriente), con programa, avance registrado por el ingeniero, gastos, anticipo y estimaciones.
+- **Fechas:** se calculan desde el día en que se aplica la migración.
+
+**Para quitarlos:** *Configuración → Base de datos → Borrar datos de prueba*. Se borran los usuarios y clientes con correo `@demo.konstruktor.mx` y las cotizaciones `DEMO-…` (con sus fotos). No se vuelven a cargar. Bórralos al terminar de probar: el repositorio es público y la contraseña está aquí.
+
+Las migraciones `.php` devuelven `function (PDO $db): void`. Corren en una transacción y pueden usar los servicios del sistema (`Calculadora`, `Estimaciones`…).

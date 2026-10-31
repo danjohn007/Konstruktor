@@ -127,6 +127,8 @@ $router->get('/api/configuracion', [ConfiguracionController::class, 'apiShow']);
 $router->put('/api/configuracion', [ConfiguracionController::class, 'apiUpdate']);
 $router->get('/api/configuracion/migraciones', [ConfiguracionController::class, 'apiMigraciones']);
 $router->post('/api/configuracion/migraciones', [ConfiguracionController::class, 'apiAplicarMigraciones']);
+$router->get('/api/configuracion/datos-prueba', [ConfiguracionController::class, 'apiDatosPrueba']);
+$router->delete('/api/configuracion/datos-prueba', [ConfiguracionController::class, 'apiBorrarDatosPrueba']);
 
 $router->get('/api/cotizaciones', [CotizacionesController::class, 'apiIndex']);
 $router->post('/api/cotizaciones', [CotizacionesController::class, 'apiStore']);

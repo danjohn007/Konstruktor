@@ -71,6 +71,17 @@
         <thead><tr><th>Migración</th><th>Estado</th></tr></thead>
         <tbody id="tablaMigraciones"></tbody>
       </table></div>
+
+      <div class="kpi mt-3 d-none" id="cardDemo">
+        <span class="kpi-icon tono-warning"><i class="bi bi-cone-striped"></i></span>
+        <div class="kpi-body flex-grow-1">
+          <div class="kpi-label">Datos de prueba</div>
+          <div class="kpi-value" style="font-size:1.05rem" id="demoResumen"></div>
+          <div class="kpi-sub">Usuarios <strong>admin@</strong>, <strong>cotizador@</strong> e <strong>ingeniero@demo.konstruktor.mx</strong> con la contraseña <strong>Demo2026!</strong>
+            Bórralos cuando termines de probar: el repositorio es público y cualquiera podría conocer esa contraseña.</div>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-danger align-self-center text-nowrap" id="btnBorrarDemo"><i class="bi bi-trash"></i> Borrar datos de prueba</button>
+      </div>
     </div>
   </div>
   <div class="d-flex justify-content-end align-items-center gap-3 px-3 py-2 border-top" id="pieGuardar" style="background:var(--slate-50);border-radius:0 0 .85rem .85rem">
@@ -104,16 +115,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     mostrarMigraciones(await api('api/configuracion/migraciones'));
+    cargarDemo();
+    document.getElementById('btnBorrarDemo').addEventListener('click', borrarDemo);
     document.getElementById('btnMigrar').addEventListener('click', async () => {
         try {
             const r = await api('api/configuracion/migraciones', 'POST', {});
             mostrarMigraciones(r.migraciones);
+            cargarDemo();
             if (r.log.length) alert(r.log.join('\n'));
         } catch (err) {
             alert(err.message);
         }
     });
 });
+
+async function cargarDemo() {
+    mostrarDemo(await api('api/configuracion/datos-prueba'));
+}
+
+function mostrarDemo(d) {
+    const hay = d.usuarios + d.clientes + d.cotizaciones > 0;
+    document.getElementById('cardDemo').classList.toggle('d-none', !hay);
+    document.getElementById('demoResumen').textContent = `${d.usuarios} usuarios · ${d.clientes} clientes · ${d.cotizaciones} cotizaciones`;
+}
+
+async function borrarDemo() {
+    if (!confirm('¿Borrar los usuarios, clientes y cotizaciones de prueba (con su avance, gastos y estimaciones)? No se puede deshacer.')) return;
+    try {
+        mostrarDemo(await api('api/configuracion/datos-prueba', 'DELETE'));
+    } catch (err) {
+        alert(err.message);
+    }
+}
 
 function mostrarMigraciones(lista) {
     document.getElementById('tablaMigraciones').innerHTML = lista.map((m) => {

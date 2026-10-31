@@ -15,6 +15,9 @@ use App\Core\Database;
  *   se vuelve a intentar desde el principio.
  * - Si el cambio también va en schema.sql, agregar el archivo al INSERT de `migraciones` de ese
  *   esquema, para que las instalaciones nuevas no lo vuelvan a aplicar.
+ * - Para cargar datos que necesitan los cálculos del sistema (P.U., totales, estimaciones) la
+ *   migración puede ser un .php que devuelve function (\PDO $db): void. Corre en una transacción:
+ *   si falla, no deja nada a medias.
  */
 class Migraciones
 {
@@ -59,10 +62,8 @@ class Migraciones
                     continue;
                 }
                 try {
-                    foreach (self::sentencias((string) file_get_contents(self::DIR . '/' . $archivo)) as $sql) {
-                        $db->exec($sql);
-                    }
-                } catch (\PDOException $e) {
+                    self::correr($db, self::DIR . '/' . $archivo);
+                } catch (\Throwable $e) {
                     error_log("Migración $archivo: " . $e->getMessage());
                     self::anotar($archivo, $e->getMessage());
                     $log[] = "Error en $archivo: " . $e->getMessage();
@@ -76,6 +77,26 @@ class Migraciones
         }
 
         return $log;
+    }
+
+    private static function correr(\PDO $db, string $ruta): void
+    {
+        if (!str_ends_with($ruta, '.php')) {
+            foreach (self::sentencias((string) file_get_contents($ruta)) as $sql) {
+                $db->exec($sql);
+            }
+            return;
+        }
+        $db->beginTransaction();
+        try {
+            (require $ruta)($db);
+            $db->commit();
+        } catch (\Throwable $e) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            throw $e;
+        }
     }
 
     /** Estado de cada archivo, para la pantalla de Configuración. */
@@ -100,7 +121,7 @@ class Migraciones
 
     private static function archivos(): array
     {
-        $archivos = array_map('basename', glob(self::DIR . '/*.sql') ?: []);
+        $archivos = array_map('basename', array_merge(glob(self::DIR . '/*.sql') ?: [], glob(self::DIR . '/*.php') ?: []));
         sort($archivos, SORT_STRING);
 
         return $archivos;

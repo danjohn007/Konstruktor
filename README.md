@@ -38,6 +38,17 @@ Pasos 1 y 4 solo se hacen la primera vez.
 
 Este correo y contraseña también sirven en la app. En la app el servidor es `https://konstruktor.com.mx/panel`.
 
+### Datos de prueba
+
+La instalación trae un usuario de prueba por rol, con la contraseña `Demo2026!`:
+- `admin@demo.konstruktor.mx`
+- `cotizador@demo.konstruktor.mx`
+- `ingeniero@demo.konstruktor.mx`
+
+También trae clientes, cotizaciones y dos obras en ejecución.
+
+Bórralos al terminar de probar en *Configuración → Base de datos → Borrar datos de prueba*. Este repositorio es público y la contraseña está escrita aquí.
+
 ### Actualizar
 
 Repite los pasos 2 y 3. Cuando pregunte, elige sobrescribir.
