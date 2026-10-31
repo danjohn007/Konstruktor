@@ -921,3 +921,12 @@ button.kpi:hover { border-color: var(--brand-200); }
 
 .asignados { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
 .asignados .badge { text-transform: none; }
+
+/* Evidencias fotográficas del avance */
+.galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: .75rem; }
+.foto-card { display: flex; flex-direction: column; overflow: hidden; padding: 0; border: 1px solid var(--slate-200); border-radius: .75rem; background: #fff; text-align: left; transition: border-color .15s, box-shadow .15s; }
+.foto-card:hover { border-color: var(--brand-300); box-shadow: 0 6px 16px -10px rgba(15, 39, 66, .5); }
+.foto-card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--slate-100); }
+.foto-pie { padding: .5rem .65rem; font-size: .78rem; color: var(--slate-700); }
+.miniatura { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; width: 64px; height: 48px; border-radius: .45rem; object-fit: cover; background: var(--slate-100); color: var(--slate-400); vertical-align: middle; }
+.foto-grande { max-width: 100%; max-height: 70vh; border-radius: .5rem; }

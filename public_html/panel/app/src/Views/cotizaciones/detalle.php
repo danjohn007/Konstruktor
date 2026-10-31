@@ -163,6 +163,7 @@ $soloOficina = $esIngeniero ? ' d-none' : '';
           <button class="chip active" data-bs-toggle="pill" data-bs-target="#subAvConceptos" type="button">Por concepto</button>
           <button class="chip" data-bs-toggle="pill" data-bs-target="#subAvSemanas" type="button">Por semana</button>
           <button class="chip" data-bs-toggle="pill" data-bs-target="#subAvRegistros" type="button">Registros <span class="cuenta" id="cuentaRegistros">0</span></button>
+          <button class="chip" data-bs-toggle="pill" data-bs-target="#subAvFotos" type="button"><i class="bi bi-images"></i> Fotos <span class="cuenta" id="cuentaFotos">0</span></button>
         </div>
         <span class="text-muted small" id="aAviso"></span>
         <button class="btn btn-sm btn-primary ms-auto" id="btnNuevoAvance"><i class="bi bi-plus-lg"></i> Registrar avance</button>
@@ -185,6 +186,9 @@ $soloOficina = $esIngeniero ? ' d-none' : '';
               <tbody id="tablaAvanceSemanas"></tbody>
             </table>
           </div>
+        </div>
+        <div class="tab-pane fade" id="subAvFotos">
+          <div class="galeria p-3" id="galeriaFotos"></div>
         </div>
         <div class="tab-pane fade" id="subAvRegistros">
           <div class="table-responsive tabla-alta">
@@ -305,6 +309,35 @@ $soloOficina = $esIngeniero ? ' d-none' : '';
 </div>
 <?php endif; ?>
 
+<!-- Historial de avance de un concepto -->
+<div class="modal fade" id="modalHistorial" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable modal-fullscreen-sm-down">
+    <div class="modal-content">
+      <div class="modal-header"><div><h5 class="modal-title" id="hiTitulo"></h5><div class="small text-muted" id="hiSub"></div></div><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="d-flex align-items-center gap-2 mb-3" id="hiBarra"></div>
+        <h6 class="mb-2">Registros de avance</h6>
+        <div class="list-group" id="hiLista"></div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <span class="small text-muted">Clic en un registro para corregirlo o cambiar su foto.</span>
+        <button type="button" class="btn btn-primary" id="hiNuevo"><i class="bi bi-plus-lg"></i> Registrar avance nuevo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Foto de evidencia en grande -->
+<div class="modal fade" id="modalFoto" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header"><div><h5 class="modal-title" id="foTitulo"></h5><div class="small text-muted" id="foSub"></div></div><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body p-2 text-center"><img id="foImg" alt="Evidencia" class="foto-grande"></div>
+      <div class="modal-footer"><a class="btn btn-outline-secondary" id="foAbrir" target="_blank"><i class="bi bi-box-arrow-up-right"></i> Abrir original</a></div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal avance -->
 <div class="modal fade" id="modalAvance" tabindex="-1">
   <div class="modal-dialog modal-fullscreen-sm-down">
@@ -320,7 +353,7 @@ $soloOficina = $esIngeniero ? ' d-none' : '';
               <div class="input-group"><input type="number" step="any" min="0.0001" class="form-control" name="cantidad" required><span class="input-group-text" id="avUnidad"></span></div></div>
             <div class="col-12"><label class="form-label">Notas</label><input class="form-control" name="notas" maxlength="255" placeholder="Ej. muro eje 3 de A a C"></div>
             <div class="col-12"><label class="form-label">Foto</label>
-              <div id="avFotoActual" class="small mb-1 d-none"><a target="_blank" id="lnkFotoAvance"><i class="bi bi-image"></i> Ver foto actual</a> (subir otra la reemplaza)</div>
+              <div id="avFotoActual" class="small mb-2 d-none"><a target="_blank" id="lnkFotoAvance"><img id="imgFotoAvance" class="miniatura me-2" alt="Foto actual"></a> Foto actual (subir otra la reemplaza)</div>
               <input type="file" class="form-control" id="avArchivo" accept="image/*" capture="environment"></div>
           </div>
         </div>
@@ -1243,7 +1276,7 @@ async function cargarAvance() {
                 <td class="num">${c.costo_real ? money(c.costo_real) : ''}</td>
                 <td class="num ${c.diferencia < 0 ? 'text-danger' : ''}">${c.costo_real ? money(c.diferencia) : ''}</td>
                 <td class="num">${c.costo_real && c.pu_real !== null ? money(c.pu_real) : ''}</td>`;
-            tr.addEventListener('click', () => abrirAvance(null, c.id));
+            tr.addEventListener('click', () => abrirHistorial(c.id));
             tb.appendChild(tr);
         });
     });
@@ -1268,9 +1301,54 @@ async function cargarAvance() {
             <td class="small">${esc(r.notas)}</td><td class="small">${esc(r.usuario)}</td>
             <td>${r.foto ? `<a href="archivos/avances/${r.id}" target="_blank" title="Ver foto" data-foto><i class="bi bi-image"></i></a>` : ''}</td>`;
         fila.addEventListener('click', () => abrirAvance(r));
-        fila.querySelector('[data-foto]')?.addEventListener('click', (ev) => ev.stopPropagation());
+        fila.querySelector('[data-foto]')?.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); verFoto(r); });
         tr.appendChild(fila);
     });
+    pintarGaleria();
+}
+
+/** Historial de un concepto: qué se ha hecho, cuándo, quién y con qué foto. */
+function abrirHistorial(conceptoId) {
+    const c = avance.conceptos.find((x) => x.id === Number(conceptoId));
+    const regs = avance.registros.filter((r) => Number(r.concepto_id) === Number(conceptoId));
+    document.getElementById('hiTitulo').textContent = `${c.clave} ${c.descripcion}`;
+    document.getElementById('hiSub').textContent = `Ejecutado ${numero(c.ejecutado)} de ${numero(c.cantidad)} ${c.unidad} · programado a hoy ${numero(c.programado)} · ${regs.length} registro(s)`;
+    document.getElementById('hiBarra').innerHTML = `${barraRealVsProgramado(c.pct, c.pct_programado)}<span class="small fw-semibold text-nowrap">${pct(c.pct)}</span>`;
+    document.getElementById('hiLista').innerHTML = regs.map((r) => `<button type="button" class="list-group-item list-group-item-action d-flex gap-3 align-items-center" data-id="${r.id}">
+        ${r.foto ? `<img src="archivos/avances/${r.id}" class="miniatura" alt="Foto" loading="lazy">` : '<span class="miniatura sin-foto"><i class="bi bi-camera"></i></span>'}
+        <span class="flex-grow-1 text-start"><span class="fw-semibold">${numero(r.cantidad)} ${esc(r.unidad)}</span> · ${fecha(r.fecha)}
+          <span class="d-block small text-muted">${esc(r.notas || 'Sin notas')} · ${esc(r.usuario || '')}</span></span>
+        <i class="bi bi-pencil text-muted"></i></button>`).join('')
+        || '<div class="vacio-tabla"><i class="bi bi-bricks"></i>Aún no hay avance registrado en este concepto</div>';
+    document.querySelectorAll('#hiLista [data-id]').forEach((b) => b.addEventListener('click', () => {
+        bootstrap.Modal.getInstance(document.getElementById('modalHistorial')).hide();
+        abrirAvance(regs.find((r) => Number(r.id) === Number(b.dataset.id)));
+    }));
+    document.getElementById('hiNuevo').onclick = () => {
+        bootstrap.Modal.getInstance(document.getElementById('modalHistorial')).hide();
+        abrirAvance(null, conceptoId);
+    };
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalHistorial')).show();
+}
+
+/** Galería de evidencias: todas las fotos de avance de la obra, la más reciente primero. */
+function pintarGaleria() {
+    const fotos = avance.registros.filter((r) => r.foto);
+    document.getElementById('cuentaFotos').textContent = fotos.length;
+    document.getElementById('galeriaFotos').innerHTML = fotos.map((r) => `<button type="button" class="foto-card" data-id="${r.id}">
+        <img src="archivos/avances/${r.id}" alt="Evidencia ${esc(r.concepto_clave)}" loading="lazy">
+        <span class="foto-pie"><b>${esc(r.concepto_clave)}</b> · ${fecha(r.fecha)} · ${numero(r.cantidad)} ${esc(r.unidad)}
+          <span class="d-block text-muted text-truncate">${esc(r.notas || r.usuario || '')}</span></span></button>`).join('')
+        || '<div class="vacio-tabla w-100"><i class="bi bi-images"></i>Aún no hay fotos. Al registrar avance, adjunta una foto como evidencia.</div>';
+    document.querySelectorAll('#galeriaFotos [data-id]').forEach((b) => b.addEventListener('click', () => verFoto(fotos.find((r) => Number(r.id) === Number(b.dataset.id)))));
+}
+
+function verFoto(r) {
+    document.getElementById('foTitulo').textContent = `${r.concepto_clave} ${String(r.concepto_descripcion).slice(0, 60)}`;
+    document.getElementById('foSub').textContent = `${fecha(r.fecha)} · ${numero(r.cantidad)} ${r.unidad} · ${r.usuario || ''}${r.notas ? ' · ' + r.notas : ''}`;
+    document.getElementById('foImg').src = 'archivos/avances/' + r.id;
+    document.getElementById('foAbrir').href = 'archivos/avances/' + r.id;
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalFoto')).show();
 }
 
 function abrirAvance(r, conceptoId = null) {
@@ -1293,6 +1371,7 @@ function abrirAvance(r, conceptoId = null) {
     document.getElementById('avArchivo').value = '';
     document.getElementById('avFotoActual').classList.toggle('d-none', !(r && r.foto));
     if (r) document.getElementById('lnkFotoAvance').href = 'archivos/avances/' + r.id;
+    if (r && r.foto) document.getElementById('imgFotoAvance').src = 'archivos/avances/' + r.id;
     document.getElementById('avTitulo').textContent = r ? 'Editar avance' : 'Registrar avance';
     document.getElementById('btnEliminarAvance').classList.toggle('d-none', !r);
     infoConceptoAvance();
