@@ -9,7 +9,7 @@ $esIngeniero = ($currentUser['rol_nombre'] ?? '') === 'Ingeniero';
 $h = fn($v) => htmlspecialchars((string) $v);
 $iniciales = implode('', array_map(fn($p) => mb_strtoupper(mb_substr($p, 0, 1)), array_slice(preg_split('/\s+/', trim($currentUser['nombre'] ?? 'K')), 0, 2)));
 // Migas: Inicio › (las que mande el controlador, etiqueta => enlace) › página actual
-$migas = $esIngeniero ? ($migas ?? []) : ['Inicio' => './'] + ($migas ?? []);
+$migas = ['Inicio' => './'] + ($migas ?? []);
 if (($titulo ?? '') === 'Inicio') {
     $migas = [];
 }
@@ -18,7 +18,8 @@ ob_start();
 ?>
       <?php if ($esIngeniero): ?>
       <div class="nav-group-label">Obra</div>
-      <a href="cotizaciones" class="<?= $isActive('/cotizaciones') ?>"><i class="bi bi-cone-striped"></i> Obras</a>
+      <a href="./" class="<?= $isActive('/') ?>"><i class="bi bi-grid-1x2"></i> Inicio</a>
+      <a href="cotizaciones" class="<?= $isActive('/cotizaciones') ?>"><i class="bi bi-cone-striped"></i> Mis obras</a>
       <?php else: ?>
       <div class="nav-group-label">Operación</div>
       <a href="./" class="<?= $isActive('/') ?>"><i class="bi bi-grid-1x2"></i> Inicio</a>
@@ -59,7 +60,7 @@ $sidebarFoot = ob_get_clean();
 </head>
 <body>
 <aside class="sidebar d-none d-lg-flex">
-  <div class="sidebar-brand"><a href="<?= $esIngeniero ? 'cotizaciones' : './' ?>"><img src="assets/img/logo.png" alt="Konstruktor"></a></div>
+  <div class="sidebar-brand"><a href="./"><img src="assets/img/logo.png" alt="Konstruktor"></a></div>
   <nav class="sidebar-nav">
 <?= $navLinks ?>
   </nav>
@@ -68,7 +69,7 @@ $sidebarFoot = ob_get_clean();
 <div class="offcanvas offcanvas-start sidebar-offcanvas" tabindex="-1" id="menuMovil">
   <div class="offcanvas-body">
     <div class="sidebar-brand d-flex align-items-center gap-2">
-      <a href="<?= $esIngeniero ? 'cotizaciones' : './' ?>" class="flex-grow-1"><img src="assets/img/logo.png" alt="Konstruktor"></a>
+      <a href="./" class="flex-grow-1"><img src="assets/img/logo.png" alt="Konstruktor"></a>
       <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
     </div>
     <nav class="sidebar-nav">

@@ -11,11 +11,48 @@ class DashboardController
     public function index(): void
     {
         Auth::requireLogin();
+        if (Auth::esIngeniero()) {
+            Response::view('dashboard/ingeniero', ['user' => Auth::user(), 'titulo' => 'Inicio', 'subtitulo' => 'Tus obras y lo que has registrado']);
+            return;
+        }
         Response::view('dashboard/index', [
             'user' => Auth::user(),
             'titulo' => 'Inicio',
             'subtitulo' => 'Cartera de cotizaciones, obras en ejecución y flujo de caja',
             'graficas' => true,
+        ]);
+    }
+
+    /** Inicio del ingeniero: sus registros recientes y su semana (avances y gastos que él capturó). */
+    public function apiIngeniero(): void
+    {
+        Auth::requireLogin();
+        $db = Database::pdo();
+        $uid = Auth::user()['id'];
+        $lunes = date('Y-m-d', strtotime('monday this week'));
+        $consulta = function (string $sql, array $params) use ($db): array {
+            $stmt = $db->prepare($sql);
+            $stmt->execute($params);
+
+            return $stmt->fetchAll();
+        };
+        $semana = $consulta(
+            "SELECT (SELECT COUNT(*) FROM avances WHERE usuario_id = ? AND fecha >= ?) AS avances,
+                    (SELECT COUNT(*) FROM movimientos WHERE usuario_id = ? AND tipo = 'egreso' AND fecha >= ?) AS gastos,
+                    (SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE usuario_id = ? AND tipo = 'egreso' AND fecha >= ?) AS gastado,
+                    (SELECT COUNT(*) FROM movimientos WHERE usuario_id = ? AND tipo = 'egreso' AND comprobante IS NULL) AS sin_comprobante",
+            [$uid, $lunes, $uid, $lunes, $uid, $lunes, $uid]
+        )[0];
+        Response::json([
+            'semana' => array_map('floatval', $semana),
+            'avances' => $consulta(
+                'SELECT a.fecha, a.cantidad, a.notas, a.foto IS NOT NULL AS foto, c.id AS cotizacion_id, c.folio, co.clave, co.descripcion, co.unidad
+                 FROM avances a JOIN cotizaciones c ON c.id = a.cotizacion_id JOIN conceptos co ON co.id = a.concepto_id
+                 WHERE a.usuario_id = ? ORDER BY a.fecha DESC, a.id DESC LIMIT 12', [$uid]),
+            'gastos' => $consulta(
+                "SELECT m.fecha, m.categoria, m.descripcion, m.monto, m.comprobante IS NOT NULL AS comprobante, c.id AS cotizacion_id, c.folio
+                 FROM movimientos m JOIN cotizaciones c ON c.id = m.cotizacion_id
+                 WHERE m.usuario_id = ? AND m.tipo = 'egreso' ORDER BY m.fecha DESC, m.id DESC LIMIT 12", [$uid]),
         ]);
     }
 

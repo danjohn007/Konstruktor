@@ -56,7 +56,7 @@ $router = new Router();
 // Ingeniero (residente de obra): ve las obras aceptadas que tiene asignadas (obra_ingenieros) y registra avance y gastos con sus fotos.
 // Lo que no está aquí le responde 403, así que una ruta nueva queda cerrada para él hasta agregarla.
 const RUTAS_INGENIERO = [
-    'GET /login', 'POST /logout', 'GET /cotizaciones', 'GET /cotizaciones/{id}', 'GET /archivos/{tipo}/{id}',
+    'GET /login', 'POST /logout', 'GET /', 'GET /api/ingeniero/resumen', 'GET /cotizaciones', 'GET /cotizaciones/{id}', 'GET /archivos/{tipo}/{id}',
     'POST /api/auth/login', 'POST /api/auth/token', 'DELETE /api/auth/token', 'GET /api/auth/yo', 'PUT /api/mi-password',
     'GET /api/obras', 'GET /api/cotizaciones', 'GET /api/cotizaciones/{id}',
     'GET /api/cotizaciones/{id}/avance', 'POST /api/cotizaciones/{id}/avances',
@@ -107,6 +107,7 @@ $router->post('/api/auth/token', [AuthController::class, 'apiToken']);
 $router->delete('/api/auth/token', [AuthController::class, 'apiRevocarToken']);
 $router->get('/api/auth/yo', [AuthController::class, 'apiYo']);
 $router->get('/api/dashboard/resumen', [DashboardController::class, 'apiResumen']);
+$router->get('/api/ingeniero/resumen', [DashboardController::class, 'apiIngeniero']);
 
 $router->get('/api/clientes', [ClientesController::class, 'apiIndex']);
 $router->post('/api/clientes', [ClientesController::class, 'apiStore']);

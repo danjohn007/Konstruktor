@@ -21,7 +21,7 @@ class CotizacionesController
     {
         Auth::requireLogin();
         Response::view('cotizaciones/index', Auth::esIngeniero()
-            ? ['user' => Auth::user(), 'titulo' => 'Obras', 'subtitulo' => 'Tus obras asignadas: registra el avance y los gastos de cada una']
+            ? ['user' => Auth::user(), 'titulo' => 'Mis obras', 'subtitulo' => 'Tus obras asignadas: registra el avance y los gastos de cada una']
             : ['user' => Auth::user(), 'titulo' => 'Cotizaciones y obras', 'subtitulo' => 'Cada cotización aceptada es una obra: ahí se llevan avance, estimaciones y gastos']);
     }
 
@@ -37,7 +37,7 @@ class CotizacionesController
         Response::view('cotizaciones/detalle', [
             'user' => Auth::user(),
             'titulo' => 'Cotización ' . $cot['folio'],
-            'migas' => [(Auth::esIngeniero() ? 'Obras' : 'Cotizaciones') => 'cotizaciones'],
+            'migas' => [(Auth::esIngeniero() ? 'Mis obras' : 'Cotizaciones') => 'cotizaciones'],
             'cotizacionId' => (int) $id,
             'graficas' => true,
             'sinTitulo' => true,

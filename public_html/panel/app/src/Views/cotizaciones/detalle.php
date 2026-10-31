@@ -498,7 +498,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     if (ES_INGENIERO) {
         await recargar();
-        bootstrap.Tab.getOrCreateInstance(document.getElementById('navAvance')).show();
+        // Desde su inicio llega con #avance o #control (botones "Avance" y "Gasto").
+        bootstrap.Tab.getOrCreateInstance(document.getElementById(location.hash === '#control' ? 'navControl' : 'navAvance')).show();
         return;
     }
     const sel = document.querySelector('#formDatos [name=cliente_id]');
