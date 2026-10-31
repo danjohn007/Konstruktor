@@ -2,7 +2,7 @@
   <?php foreach ([
       ['Admin', 'shield-lock', 'tono-navy', 'Todo el sistema, incluida configuración, usuarios y eliminaciones.'],
       ['Cotizador', 'calculator', 'tono-brand', 'Cotizaciones, estimaciones, control de obra y catálogos.'],
-      ['Ingeniero', 'cone-striped', 'tono-warning', 'Residente de obra: ve las obras aceptadas y registra avance y gastos con fotos, en la web y la app.'],
+      ['Ingeniero', 'cone-striped', 'tono-warning', 'Residente de obra: ve solo las obras que tiene asignadas y registra avance y gastos con fotos, en la web y la app. Se asigna en cada cotización.'],
   ] as [$rol, $icono, $tono, $texto]): ?>
   <div class="col-md-4">
     <div class="kpi">

@@ -918,3 +918,6 @@ button.kpi:hover { border-color: var(--brand-200); }
     .stat-card .stat-value, .stat-card .fs-4, .stat-card .fs-5 { font-size: 1.1rem !important; }
     .page-header { margin-bottom: .75rem; }
 }
+
+.asignados { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+.asignados .badge { text-transform: none; }

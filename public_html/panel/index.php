@@ -53,7 +53,7 @@ try {
 
 $router = new Router();
 
-// Ingeniero (residente de obra): ve las obras aceptadas y registra avance y gastos con sus fotos.
+// Ingeniero (residente de obra): ve las obras aceptadas que tiene asignadas (obra_ingenieros) y registra avance y gastos con sus fotos.
 // Lo que no está aquí le responde 403, así que una ruta nueva queda cerrada para él hasta agregarla.
 const RUTAS_INGENIERO = [
     'GET /login', 'POST /logout', 'GET /cotizaciones', 'GET /cotizaciones/{id}', 'GET /archivos/{tipo}/{id}',
@@ -69,9 +69,10 @@ $router->guard(function (string $method, string $pattern, array $params): bool {
         return true;
     }
     $permitida = in_array("$method $pattern", RUTAS_INGENIERO, true);
-    // De las cotizaciones solo ve las aceptadas (las obras), no las que siguen en cotización.
+    // De las cotizaciones solo ve las obras (aceptadas) que tiene asignadas.
     if ($permitida && str_contains($pattern, 'cotizaciones/{id}')) {
-        $permitida = CotizacionesController::estado((int) $params[0]) === 'aceptada';
+        $permitida = CotizacionesController::estado((int) $params[0]) === 'aceptada'
+            && CotizacionesController::asignada((int) $params[0], (int) \App\Core\Auth::user()['id']);
     }
     if ($permitida) {
         return true;
@@ -136,6 +137,8 @@ $router->get('/api/cotizaciones/{id}', [CotizacionesController::class, 'apiShow'
 $router->put('/api/cotizaciones/{id}', [CotizacionesController::class, 'apiUpdate']);
 $router->delete('/api/cotizaciones/{id}', [CotizacionesController::class, 'apiDelete']);
 $router->post('/api/cotizaciones/{id}/actualizar-precios', [CotizacionesController::class, 'apiActualizarPrecios']);
+$router->get('/api/cotizaciones/{id}/ingenieros', [CotizacionesController::class, 'apiIngenieros']);
+$router->put('/api/cotizaciones/{id}/ingenieros', [CotizacionesController::class, 'apiAsignarIngenieros']);
 $router->post('/api/cotizaciones/{id}/partidas', [CotizacionesController::class, 'apiStorePartida']);
 
 $router->put('/api/partidas/{id}', [CotizacionesController::class, 'apiUpdatePartida']);

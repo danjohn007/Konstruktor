@@ -18,7 +18,7 @@
   </div>
   <div class="table-responsive">
   <table class="table mb-0">
-    <thead><tr><th>Folio</th><th>Obra</th><th>Cliente</th><th>Fecha</th><th>Estado</th><th class="num">Subtotal</th><th class="num">Total con IVA</th></tr></thead>
+    <thead><tr><th>Folio</th><th>Obra</th><th>Cliente</th><th>Fecha</th><th>Estado</th><?php if (!$esIngeniero): ?><th>Ingeniero</th><?php endif; ?><th class="num">Subtotal</th><th class="num">Total con IVA</th></tr></thead>
     <tbody id="tabla"><tr><td colspan="7" class="vacio-tabla">Cargando…</td></tr></tbody>
   </table>
   </div>
@@ -52,6 +52,7 @@
 <script>
 let modal;
 let cotizaciones = [];
+const CON_INGENIERO = <?= $esIngeniero ? 'false' : 'true' ?>;
 let estado = new URLSearchParams(location.search).get('estado') || '';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -76,12 +77,14 @@ function pintar() {
     const suma = data.reduce((s, c) => s + Number(c.total), 0);
     document.getElementById('sumaLista').textContent = data.length ? `${data.length} · ${money(suma)} con IVA` : '';
     const tb = document.getElementById('tabla');
-    tb.innerHTML = data.length ? '' : '<tr><td colspan="7" class="vacio-tabla"><i class="bi bi-file-earmark-spreadsheet"></i>Sin cotizaciones</td></tr>';
+    tb.innerHTML = data.length ? '' : `<tr><td colspan="8" class="vacio-tabla"><i class="bi bi-file-earmark-spreadsheet"></i>${CON_INGENIERO ? 'Sin cotizaciones' : 'No tienes obras asignadas. Pide a la oficina que te asigne a tu obra.'}</td></tr>`;
     data.forEach((c) => {
         const tr = document.createElement('tr');
         tr.className = 'fila-click';
         tr.innerHTML = `<td class="text-nowrap fw-semibold">${esc(c.folio)}</td><td>${esc(c.obra)}</td><td class="text-muted">${esc(c.cliente || '—')}</td><td class="text-nowrap">${fecha(c.fecha_cotizacion)}</td>
-            <td><span class="badge estado-${esc(c.estado)}">${esc(c.estado)}</span></td><td class="num">${money(c.subtotal)}</td><td class="num fw-semibold">${money(c.total)}</td>`;
+            <td><span class="badge estado-${esc(c.estado)}">${esc(c.estado)}</span></td>
+            ${CON_INGENIERO ? `<td class="small">${c.ingenieros ? esc(c.ingenieros) : (c.estado === 'aceptada' ? '<span class="text-danger">Sin asignar</span>' : '<span class="text-muted">—</span>')}</td>` : ''}
+            <td class="num">${money(c.subtotal)}</td><td class="num fw-semibold">${money(c.total)}</td>`;
         tr.addEventListener('click', () => { window.location.href = 'cotizaciones/' + c.id; });
         tb.appendChild(tr);
     });

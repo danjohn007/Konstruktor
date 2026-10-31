@@ -192,7 +192,9 @@ Sin `DELIMITER`, procedimientos ni triggers: cada sentencia termina en `;` al fi
 - **Admin**: todo, incluida Configuración y eliminar cotizaciones, clientes e insumos.
 - **Cotizador**: cotizaciones, estimaciones, control de obra, clientes, insumos y cuadrillas (sin Configuración, Usuarios ni eliminaciones de catálogo o de movimientos).
 - **Ingeniero** (residente de obra), en la web y en la app:
-  - Solo ve las cotizaciones **aceptadas** (en el menú, *Obras*). En cada una consulta el catálogo, el programa, el avance y el control de obra.
+  - Solo ve las obras que tiene **asignadas** (cotizaciones aceptadas; en el menú, *Obras*). En cada una consulta el catálogo, el programa, el avance y el control de obra.
+  - **Asignar:** el Admin o el Cotizador abren la cotización y, junto al nombre de la obra, pulsan *Ingenieros → Asignar*. Una obra puede tener varios ingenieros. La lista de cotizaciones muestra quién la lleva y marca en rojo las obras aceptadas sin asignar.
+  - Sin asignación no ve la obra en ningún lado: la web, la app, las fotos y la API le responden 403. La migración `007_obra_ingenieros.sql` asignó las obras que ya existían a los ingenieros de ese momento.
   - Registra **avance** con foto y **gastos** de la obra con su comprobante. Solo corrige los registros que él hizo.
   - No ve Inicio, clientes, insumos, cuadrillas, datos generales, estimaciones, flujo ni el presupuesto imprimible.
   - No registra ingresos, préstamos ni retiros de utilidad.

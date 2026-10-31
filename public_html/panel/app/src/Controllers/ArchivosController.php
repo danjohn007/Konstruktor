@@ -25,9 +25,14 @@ class ArchivosController
             return;
         }
         [$tabla, $columna] = self::TIPOS[$tipo];
-        $stmt = Database::pdo()->prepare("SELECT $columna FROM $tabla WHERE id = ?");
+        $stmt = Database::pdo()->prepare("SELECT $columna, cotizacion_id FROM $tabla WHERE id = ?");
         $stmt->execute([$id]);
-        $ruta = Archivos::ruta($stmt->fetchColumn() ?: null);
+        $fila = $stmt->fetch() ?: [];
+        // El ingeniero solo ve los archivos de las obras que tiene asignadas.
+        if ($fila && Auth::esIngeniero() && !CotizacionesController::asignada((int) $fila['cotizacion_id'], (int) Auth::user()['id'])) {
+            $fila = [];
+        }
+        $ruta = Archivos::ruta($fila[$columna] ?? null);
         if (!$ruta) {
             http_response_code(404);
             echo 'Archivo no encontrado';

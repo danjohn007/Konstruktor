@@ -141,7 +141,15 @@ class ObraController
         Auth::requireLogin();
         $db = Database::pdo();
         $estados = ($_GET['todas'] ?? '') === '1' ? "'aceptada','enviada'" : "'aceptada'";
-        $ids = $db->query("SELECT id FROM cotizaciones WHERE estado IN ($estados) ORDER BY updated_at DESC")->fetchAll(\PDO::FETCH_COLUMN);
+        if (Auth::esIngeniero()) {
+            // El ingeniero solo ve las obras que tiene asignadas.
+            $stmt = $db->prepare("SELECT c.id FROM cotizaciones c JOIN obra_ingenieros oi ON oi.cotizacion_id = c.id AND oi.usuario_id = ?
+                                  WHERE c.estado = 'aceptada' ORDER BY c.updated_at DESC");
+            $stmt->execute([Auth::user()['id']]);
+            $ids = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        } else {
+            $ids = $db->query("SELECT id FROM cotizaciones WHERE estado IN ($estados) ORDER BY updated_at DESC")->fetchAll(\PDO::FETCH_COLUMN);
+        }
 
         $noCosto = "'" . implode("','", Programa::NO_COSTO) . "'";
         $movs = $db->prepare(

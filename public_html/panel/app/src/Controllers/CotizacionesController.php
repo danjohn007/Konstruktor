@@ -21,7 +21,7 @@ class CotizacionesController
     {
         Auth::requireLogin();
         Response::view('cotizaciones/index', Auth::esIngeniero()
-            ? ['user' => Auth::user(), 'titulo' => 'Obras', 'subtitulo' => 'Obras en ejecución: registra el avance y los gastos de cada una']
+            ? ['user' => Auth::user(), 'titulo' => 'Obras', 'subtitulo' => 'Tus obras asignadas: registra el avance y los gastos de cada una']
             : ['user' => Auth::user(), 'titulo' => 'Cotizaciones y obras', 'subtitulo' => 'Cada cotización aceptada es una obra: ahí se llevan avance, estimaciones y gastos']);
     }
 
@@ -69,14 +69,18 @@ class CotizacionesController
             array_push($params, "%$q%", "%$q%", "%$q%");
         }
         if (Auth::esIngeniero()) {
-            $where[] = "c.estado = 'aceptada'"; // el ingeniero solo ve las obras
+            // el ingeniero solo ve las obras (aceptadas) que tiene asignadas
+            $where[] = "c.estado = 'aceptada' AND EXISTS (SELECT 1 FROM obra_ingenieros oi WHERE oi.cotizacion_id = c.id AND oi.usuario_id = ?)";
+            $params[] = Auth::user()['id'];
         } elseif (in_array($_GET['estado'] ?? '', self::ESTADOS, true)) {
             $where[] = 'c.estado = ?';
             $params[] = $_GET['estado'];
         }
 
         $stmt = Database::pdo()->prepare(
-            'SELECT c.id, c.folio, c.obra, c.municipio, c.estado, c.fecha_cotizacion, c.subtotal, c.total, cl.nombre AS cliente
+            'SELECT c.id, c.folio, c.obra, c.municipio, c.estado, c.fecha_cotizacion, c.subtotal, c.total, cl.nombre AS cliente,
+                    (SELECT GROUP_CONCAT(u.nombre ORDER BY u.nombre SEPARATOR \', \') FROM obra_ingenieros oi JOIN usuarios u ON u.id = oi.usuario_id
+                     WHERE oi.cotizacion_id = c.id) AS ingenieros
              FROM cotizaciones c LEFT JOIN clientes cl ON cl.id = c.cliente_id'
             . ($where ? ' WHERE ' . implode(' AND ', $where) : '') . ' ORDER BY c.id DESC'
         );
@@ -481,6 +485,57 @@ class CotizacionesController
         $cot = $stmt->fetchColumn();
 
         return $cot ? (int) $cot : null;
+    }
+
+    /** El ingeniero tiene asignada esta obra (solo entonces la ve). */
+    public static function asignada(int $cotizacionId, int $usuarioId): bool
+    {
+        $stmt = Database::pdo()->prepare('SELECT 1 FROM obra_ingenieros WHERE cotizacion_id = ? AND usuario_id = ?');
+        $stmt->execute([$cotizacionId, $usuarioId]);
+
+        return (bool) $stmt->fetchColumn();
+    }
+
+    /** Ingenieros asignados a la obra y los que se pueden asignar (activos con rol Ingeniero). */
+    public function apiIngenieros(string $id): void
+    {
+        Auth::requireLogin();
+        $db = Database::pdo();
+        $stmt = $db->prepare(
+            "SELECT u.id, u.nombre, u.email, u.activo, (oi.usuario_id IS NOT NULL) AS asignado
+             FROM usuarios u JOIN roles r ON r.id = u.rol_id AND r.nombre = 'Ingeniero'
+             LEFT JOIN obra_ingenieros oi ON oi.usuario_id = u.id AND oi.cotizacion_id = ?
+             WHERE u.activo = 1 OR oi.usuario_id IS NOT NULL ORDER BY u.nombre"
+        );
+        $stmt->execute([$id]);
+        Response::json(array_map(fn($u) => [...$u, 'asignado' => (bool) $u['asignado'], 'activo' => (bool) $u['activo']], $stmt->fetchAll()));
+    }
+
+    /** Reemplaza los ingenieros asignados: {usuarios: [id, ...]}. */
+    public function apiAsignarIngenieros(string $id): void
+    {
+        Auth::requireLogin();
+        if (self::estado((int) $id) === null) {
+            Response::json(['error' => 'Cotización no encontrada'], 404);
+            return;
+        }
+        $ids = array_values(array_unique(array_map('intval', (array) (Request::json()['usuarios'] ?? []))));
+        $db = Database::pdo();
+        $validos = [];
+        if ($ids) {
+            $marcas = implode(',', array_fill(0, count($ids), '?'));
+            $stmt = $db->prepare("SELECT u.id FROM usuarios u JOIN roles r ON r.id = u.rol_id AND r.nombre = 'Ingeniero' WHERE u.id IN ($marcas)");
+            $stmt->execute($ids);
+            $validos = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        }
+        $db->beginTransaction();
+        $db->prepare('DELETE FROM obra_ingenieros WHERE cotizacion_id = ?')->execute([$id]);
+        $ins = $db->prepare('INSERT INTO obra_ingenieros (cotizacion_id, usuario_id) VALUES (?, ?)');
+        foreach ($validos as $usuarioId) {
+            $ins->execute([$id, $usuarioId]);
+        }
+        $db->commit();
+        $this->apiIngenieros($id);
     }
 
     public static function estado(int $cotizacionId): ?string

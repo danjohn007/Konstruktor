@@ -241,6 +241,16 @@ CREATE TABLE IF NOT EXISTS avances (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Obras asignadas a cada ingeniero (residente): solo ve esas (migración 007)
+CREATE TABLE IF NOT EXISTS obra_ingenieros (
+    cotizacion_id INT NOT NULL,
+    usuario_id INT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (cotizacion_id, usuario_id),
+    FOREIGN KEY (cotizacion_id) REFERENCES cotizaciones(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- ===================== Migraciones =====================
 
 -- Cambios a la base que el sistema aplica solo (app/database/migraciones, ver Services/Migraciones.php).

@@ -90,7 +90,7 @@ class Auth
         return $user !== null && in_array($user['rol_nombre'], $roles, true);
     }
 
-    /** Residente de obra: solo ve obras aceptadas y registra avance y gastos (ver RUTAS_INGENIERO en index.php). */
+    /** Residente de obra: solo ve las obras que tiene asignadas y registra avance y gastos (ver RUTAS_INGENIERO en index.php). */
     public static function esIngeniero(): bool
     {
         self::refrescar();

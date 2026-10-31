@@ -1,6 +1,6 @@
 <?php
 $esAdmin = ($user['rol_nombre'] ?? '') === 'Admin';
-// El ingeniero (residente) solo ve obras aceptadas: catálogo y programa de consulta, y registra avance y gastos.
+// El ingeniero (residente) solo ve sus obras asignadas: catálogo y programa de consulta, y registra avance y gastos.
 $esIngeniero = ($user['rol_nombre'] ?? '') === 'Ingeniero';
 $soloOficina = $esIngeniero ? ' d-none' : '';
 ?>
@@ -8,6 +8,13 @@ $soloOficina = $esIngeniero ? ' d-none' : '';
   <div>
     <h1 class="page-title" id="hObra"></h1>
     <div class="page-subtitle" id="hSub"></div>
+    <?php if (!$esIngeniero): ?>
+    <div class="asignados mt-2" id="asignados">
+      <span class="small text-muted"><i class="bi bi-cone-striped"></i> Ingenieros:</span>
+      <span id="listaAsignados" class="d-inline-flex flex-wrap gap-1"></span>
+      <button type="button" class="btn btn-link btn-sm p-0 fw-semibold" id="btnAsignar"><i class="bi bi-person-plus"></i> Asignar</button>
+    </div>
+    <?php endif; ?>
   </div>
   <div class="d-flex flex-wrap gap-2">
     <button class="btn btn-outline-secondary" id="btnPrecios" title="Copia a los análisis los precios vigentes del catálogo de insumos"><i class="bi bi-arrow-repeat"></i> Actualizar precios</button>
@@ -281,6 +288,23 @@ $soloOficina = $esIngeniero ? ' d-none' : '';
   </div>
 </div>
 
+<?php if (!$esIngeniero): ?>
+<!-- Modal ingenieros asignados -->
+<div class="modal fade" id="modalAsignar" tabindex="-1">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Ingenieros de la obra</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <p class="small text-muted">Cada ingeniero (residente) ve solo las obras que tiene asignadas, en la web y en la app, y ahí registra avance y gastos. La obra aparece cuando la cotización está <strong>aceptada</strong>.</p>
+        <div class="list-group" id="listaIngenieros"></div>
+        <p class="small text-muted mt-2 mb-0 d-none" id="sinIngenieros">No hay usuarios con rol Ingeniero. Créalos en <a href="usuarios">Usuarios</a>.</p>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-primary" id="btnGuardarAsignados">Guardar</button></div>
+    </div>
+  </div>
+</div>
+<?php endif; ?>
+
 <!-- Modal avance -->
 <div class="modal fade" id="modalAvance" tabindex="-1">
   <div class="modal-dialog modal-fullscreen-sm-down">
@@ -467,6 +491,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     buscar.addEventListener('input', debounce(buscarInsumos, 250));
     buscar.addEventListener('blur', () => setTimeout(() => { document.getElementById('resultadosInsumo').innerHTML = ''; }, 200));
 
+    if (!ES_INGENIERO) {
+        document.getElementById('btnAsignar').addEventListener('click', abrirAsignar);
+        document.getElementById('btnGuardarAsignados').addEventListener('click', guardarAsignados);
+        cargarAsignados();
+    }
     if (ES_INGENIERO) {
         await recargar();
         bootstrap.Tab.getOrCreateInstance(document.getElementById('navAvance')).show();
@@ -510,6 +539,43 @@ function todosLosConceptos() {
 
 function buscarConcepto(id) {
     return todosLosConceptos().find((c) => Number(c.id) === Number(id));
+}
+
+// ------------------------------------------------------------- ingenieros asignados
+
+let ingenieros = [];
+
+async function cargarAsignados() {
+    if (ES_INGENIERO) return;
+    ingenieros = await api(`api/cotizaciones/${COT_ID}/ingenieros`);
+    pintarAsignados();
+}
+
+function pintarAsignados() {
+    const asignados = ingenieros.filter((u) => u.asignado);
+    document.getElementById('listaAsignados').innerHTML = asignados.length
+        ? asignados.map((u) => `<span class="badge rol-Ingeniero">${esc(u.nombre)}${u.activo ? '' : ' (inactivo)'}</span>`).join('')
+        : '<span class="small text-danger">ninguno, ningún ingeniero ve esta obra</span>';
+}
+
+function abrirAsignar() {
+    const lista = document.getElementById('listaIngenieros');
+    lista.innerHTML = ingenieros.map((u) => `<label class="list-group-item d-flex align-items-center gap-2">
+        <input class="form-check-input m-0" type="checkbox" value="${u.id}" ${u.asignado ? 'checked' : ''}>
+        <span><span class="fw-semibold">${esc(u.nombre)}</span><span class="d-block small text-muted">${esc(u.email)}${u.activo ? '' : ' · inactivo'}</span></span></label>`).join('');
+    document.getElementById('sinIngenieros').classList.toggle('d-none', ingenieros.length > 0);
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalAsignar')).show();
+}
+
+async function guardarAsignados() {
+    const usuarios = [...document.querySelectorAll('#listaIngenieros input:checked')].map((el) => Number(el.value));
+    try {
+        ingenieros = await api(`api/cotizaciones/${COT_ID}/ingenieros`, 'PUT', { usuarios });
+        pintarAsignados();
+        bootstrap.Modal.getInstance(document.getElementById('modalAsignar')).hide();
+    } catch (err) {
+        alert(err.message);
+    }
 }
 
 function renderEncabezado() {
