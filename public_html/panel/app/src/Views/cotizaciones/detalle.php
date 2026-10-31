@@ -320,7 +320,7 @@ $soloOficina = $esIngeniero ? ' d-none' : '';
         <div class="list-group" id="hiLista"></div>
       </div>
       <div class="modal-footer justify-content-between">
-        <span class="small text-muted">Clic en un registro para corregirlo o cambiar su foto.</span>
+        <span class="small text-muted">Clic en un registro para ver qué se hizo y su foto.</span>
         <button type="button" class="btn btn-primary" id="hiNuevo"><i class="bi bi-plus-lg"></i> Registrar avance nuevo</button>
       </div>
     </div>
@@ -332,8 +332,15 @@ $soloOficina = $esIngeniero ? ' d-none' : '';
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header"><div><h5 class="modal-title" id="foTitulo"></h5><div class="small text-muted" id="foSub"></div></div><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body p-2 text-center"><img id="foImg" alt="Evidencia" class="foto-grande"></div>
-      <div class="modal-footer"><a class="btn btn-outline-secondary" id="foAbrir" target="_blank"><i class="bi bi-box-arrow-up-right"></i> Abrir original</a></div>
+      <div class="modal-body">
+        <dl class="row small mb-3" id="foDatos"></dl>
+        <div class="text-center" id="foConFoto"><img id="foImg" alt="Evidencia" class="foto-grande"></div>
+        <div class="vacio-tabla border rounded-3 d-none" id="foSinFoto"><i class="bi bi-camera"></i>Este avance no tiene foto. Agrégala con Editar.</div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <a class="btn btn-outline-secondary" id="foAbrir" target="_blank"><i class="bi bi-box-arrow-up-right"></i> Abrir foto original</a>
+        <button type="button" class="btn btn-primary" id="foEditar"><i class="bi bi-pencil"></i> Editar</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1300,7 +1307,7 @@ async function cargarAvance() {
             <td class="num">${numero(r.cantidad)} ${esc(r.unidad)}</td><td class="num">${money(r.cantidad * pu)}</td>
             <td class="small">${esc(r.notas)}</td><td class="small">${esc(r.usuario)}</td>
             <td>${r.foto ? `<a href="archivos/avances/${r.id}" target="_blank" title="Ver foto" data-foto><i class="bi bi-image"></i></a>` : ''}</td>`;
-        fila.addEventListener('click', () => abrirAvance(r));
+        fila.addEventListener('click', () => verFoto(r));
         fila.querySelector('[data-foto]')?.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); verFoto(r); });
         tr.appendChild(fila);
     });
@@ -1318,11 +1325,11 @@ function abrirHistorial(conceptoId) {
         ${r.foto ? `<img src="archivos/avances/${r.id}" class="miniatura" alt="Foto" loading="lazy">` : '<span class="miniatura sin-foto"><i class="bi bi-camera"></i></span>'}
         <span class="flex-grow-1 text-start"><span class="fw-semibold">${numero(r.cantidad)} ${esc(r.unidad)}</span> · ${fecha(r.fecha)}
           <span class="d-block small text-muted">${esc(r.notas || 'Sin notas')} · ${esc(r.usuario || '')}</span></span>
-        <i class="bi bi-pencil text-muted"></i></button>`).join('')
+        <i class="bi bi-chevron-right text-muted"></i></button>`).join('')
         || '<div class="vacio-tabla"><i class="bi bi-bricks"></i>Aún no hay avance registrado en este concepto</div>';
     document.querySelectorAll('#hiLista [data-id]').forEach((b) => b.addEventListener('click', () => {
         bootstrap.Modal.getInstance(document.getElementById('modalHistorial')).hide();
-        abrirAvance(regs.find((r) => Number(r.id) === Number(b.dataset.id)));
+        verFoto(regs.find((r) => Number(r.id) === Number(b.dataset.id)));
     }));
     document.getElementById('hiNuevo').onclick = () => {
         bootstrap.Modal.getInstance(document.getElementById('modalHistorial')).hide();
@@ -1343,11 +1350,28 @@ function pintarGaleria() {
     document.querySelectorAll('#galeriaFotos [data-id]').forEach((b) => b.addEventListener('click', () => verFoto(fotos.find((r) => Number(r.id) === Number(b.dataset.id)))));
 }
 
+/** Ficha de un avance ya registrado (solo lectura): qué se hizo, cuánto, cuándo, quién y su foto. */
 function verFoto(r) {
-    document.getElementById('foTitulo').textContent = `${r.concepto_clave} ${String(r.concepto_descripcion).slice(0, 60)}`;
-    document.getElementById('foSub').textContent = `${fecha(r.fecha)} · ${numero(r.cantidad)} ${r.unidad} · ${r.usuario || ''}${r.notas ? ' · ' + r.notas : ''}`;
-    document.getElementById('foImg').src = 'archivos/avances/' + r.id;
-    document.getElementById('foAbrir').href = 'archivos/avances/' + r.id;
+    const c = avance.conceptos.find((x) => x.id === Number(r.concepto_id));
+    document.getElementById('foTitulo').textContent = `Avance del ${fecha(r.fecha)}`;
+    document.getElementById('foSub').textContent = `${r.concepto_clave} ${r.concepto_descripcion}`;
+    const dato = (k, v) => `<dt class="col-4 text-muted fw-normal">${k}</dt><dd class="col-8 mb-1">${v}</dd>`;
+    document.getElementById('foDatos').innerHTML = dato('Se ejecutó', `<strong>${numero(r.cantidad)} ${esc(r.unidad)}</strong>${c ? ` · ${money(r.cantidad * c.pu)}` : ''}`)
+        + dato('Notas', esc(r.notas || 'Sin notas'))
+        + dato('Registró', esc(r.usuario || '—'))
+        + (c ? dato('Concepto a la fecha', `${numero(c.ejecutado)} de ${numero(c.cantidad)} ${esc(c.unidad)} (${pct(c.pct)})`) : '');
+    const hayFoto = !!r.foto;
+    document.getElementById('foConFoto').classList.toggle('d-none', !hayFoto);
+    document.getElementById('foSinFoto').classList.toggle('d-none', hayFoto);
+    document.getElementById('foAbrir').classList.toggle('d-none', !hayFoto);
+    if (hayFoto) {
+        document.getElementById('foImg').src = 'archivos/avances/' + r.id;
+        document.getElementById('foAbrir').href = 'archivos/avances/' + r.id;
+    }
+    document.getElementById('foEditar').onclick = () => {
+        bootstrap.Modal.getInstance(document.getElementById('modalFoto')).hide();
+        abrirAvance(r);
+    };
     bootstrap.Modal.getOrCreateInstance(document.getElementById('modalFoto')).show();
 }
 
