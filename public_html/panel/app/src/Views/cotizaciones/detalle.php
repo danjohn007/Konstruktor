@@ -1,4 +1,9 @@
-<?php $esAdmin = ($user['rol_nombre'] ?? '') === 'Admin'; ?>
+<?php
+$esAdmin = ($user['rol_nombre'] ?? '') === 'Admin';
+// El ingeniero (residente) solo ve obras aceptadas: catálogo y programa de consulta, y registra avance y gastos.
+$esIngeniero = ($user['rol_nombre'] ?? '') === 'Ingeniero';
+$soloOficina = $esIngeniero ? ' d-none' : '';
+?>
 <div class="d-flex flex-wrap gap-2 justify-content-between align-items-start mb-3">
   <div>
     <div class="fs-5 fw-semibold" id="hObra"></div>
@@ -6,7 +11,7 @@
   </div>
   <div class="d-flex flex-wrap gap-2">
     <button class="btn btn-outline-secondary" id="btnPrecios" title="Copia a los análisis los precios vigentes del catálogo de insumos"><i class="bi bi-arrow-repeat"></i> Actualizar precios</button>
-    <a class="btn btn-primary" target="_blank" href="cotizaciones/<?= (int) $cotizacionId ?>/presupuesto"><i class="bi bi-printer"></i> Presupuesto</a>
+    <a class="btn btn-primary<?= $soloOficina ?>" target="_blank" href="cotizaciones/<?= (int) $cotizacionId ?>/presupuesto"><i class="bi bi-printer"></i> Presupuesto</a>
     <?php if ($esAdmin): ?>
     <button class="btn btn-outline-danger" id="btnEliminarCot" title="Eliminar cotización"><i class="bi bi-trash"></i></button>
     <?php endif; ?>
@@ -24,11 +29,11 @@
   <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabCatalogo" type="button">Catálogo y P.U.</button></li>
   <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabExplosion" type="button">Explosión de insumos</button></li>
   <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabPrograma" type="button">Programa de obra</button></li>
-  <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabDatos" type="button">Datos generales</button></li>
-  <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabEstimaciones" type="button" id="navEstimaciones">Estimaciones</button></li>
+  <li class="nav-item<?= $soloOficina ?>"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabDatos" type="button">Datos generales</button></li>
+  <li class="nav-item<?= $soloOficina ?>"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabEstimaciones" type="button" id="navEstimaciones">Estimaciones</button></li>
   <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabAvance" type="button" id="navAvance">Avance</button></li>
   <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabControl" type="button" id="navControl">Control de obra</button></li>
-  <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabFlujo" type="button" id="navFlujo">Compras y flujo</button></li>
+  <li class="nav-item<?= $soloOficina ?>"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabFlujo" type="button" id="navFlujo">Compras y flujo</button></li>
 </ul>
 <div id="avisoBloqueo" class="alert alert-info py-2 d-none"><i class="bi bi-lock"></i> Cotización <strong>aceptada</strong>: el catálogo, los análisis y los porcentajes quedaron fijos como contrato. Lo ejecutado se registra en <em>Avance</em>, lo cobrado en <em>Estimaciones</em> y los gastos en <em>Control de obra</em>.</div>
 
@@ -165,7 +170,7 @@
     <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-2">
       <h6 class="mb-0">Movimientos</h6>
       <div class="d-flex gap-2">
-        <button class="btn btn-sm btn-outline-success" onclick="abrirMovimiento(null, 'ingreso')"><i class="bi bi-plus-lg"></i> Ingreso</button>
+        <button class="btn btn-sm btn-outline-success<?= $soloOficina ?>" onclick="abrirMovimiento(null, 'ingreso')"><i class="bi bi-plus-lg"></i> Ingreso</button>
         <button class="btn btn-sm btn-outline-danger" onclick="abrirMovimiento(null, 'egreso')"><i class="bi bi-plus-lg"></i> Egreso</button>
       </div>
     </div>
@@ -352,6 +357,7 @@
 
 <script>
 const COT_ID = <?= (int) $cotizacionId ?>;
+const ES_INGENIERO = <?= $esIngeniero ? 'true' : 'false' ?>;
 let cot = null;
 let conceptoActual = null;
 let modalPartida, modalConcepto, modalMovimiento, modalAvance;
@@ -393,6 +399,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     buscar.addEventListener('input', debounce(buscarInsumos, 250));
     buscar.addEventListener('blur', () => setTimeout(() => { document.getElementById('resultadosInsumo').innerHTML = ''; }, 200));
 
+    if (ES_INGENIERO) {
+        await recargar();
+        bootstrap.Tab.getOrCreateInstance(document.getElementById('navAvance')).show();
+        return;
+    }
     const sel = document.querySelector('#formDatos [name=cliente_id]');
     (await api('api/clientes')).forEach((c) => sel.insertAdjacentHTML('beforeend', `<option value="${c.id}">${esc(c.nombre)}</option>`));
     await recargar();
@@ -884,7 +895,8 @@ async function cargarControl() {
 
 const CATEGORIAS = {
     ingreso: ['ANTICIPO', 'ESTIMACION', 'PRESTAMO', 'OTRO'],
-    egreso: ['MAT', 'MO', 'EQ', 'SUBCONTRATO', 'INDIRECTO', 'OTRO', 'UTILIDAD', 'PRESTAMO'],
+    // El ingeniero solo registra gastos de la obra (retiros y préstamos los lleva la oficina).
+    egreso: ['MAT', 'MO', 'EQ', 'SUBCONTRATO', 'INDIRECTO', 'OTRO', ...(ES_INGENIERO ? [] : ['UTILIDAD', 'PRESTAMO'])],
 };
 
 function abrirMovimiento(m, tipo) {

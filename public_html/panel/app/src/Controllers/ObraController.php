@@ -237,6 +237,10 @@ class ObraController
             Response::json(['error' => 'Este ingreso viene del cobro de una estimación; no se edita a mano'], 409);
             return;
         }
+        if (Auth::esIngeniero() && (int) $mov['usuario_id'] !== (int) Auth::user()['id']) {
+            Response::json(['error' => 'Solo puedes modificar los gastos que tú registraste'], 403);
+            return;
+        }
         $d = $this->validar(Request::json(), (int) $mov['cotizacion_id']);
         if ($d === null) {
             return;
@@ -272,6 +276,11 @@ class ObraController
 
         if (!isset(self::CATEGORIAS[$tipo]) || !in_array($categoria, self::CATEGORIAS[$tipo], true)) {
             Response::json(['error' => 'Tipo o categoría inválidos'], 422);
+            return null;
+        }
+        // El ingeniero registra gastos de la obra; cobros, préstamos y retiros los lleva la oficina.
+        if (Auth::esIngeniero() && !($tipo === 'egreso' && Programa::esCosto(['tipo' => $tipo, 'categoria' => $categoria]))) {
+            Response::json(['error' => 'Como Ingeniero solo puedes registrar gastos de la obra'], 403);
             return null;
         }
         if ($fecha === null || $descripcion === null || $monto === null || $monto <= 0) {

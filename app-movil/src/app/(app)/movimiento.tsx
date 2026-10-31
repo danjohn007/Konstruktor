@@ -8,6 +8,7 @@ import { Boton, Campo, Opciones, estilos as ui } from '@/components/ui';
 import { obtener } from '@/lib/api';
 import { encolar } from '@/lib/cola';
 import { haceDiasISO, leerNumero, money } from '@/lib/formato';
+import { useSesion } from '@/lib/sesion';
 import { Espacio } from '@/lib/tema';
 import { CATEGORIAS, FORMAS_PAGO, NO_COSTO, NOMBRE_CATEGORIA, type Control } from '@/lib/tipos';
 
@@ -21,6 +22,8 @@ const DIAS = [
 export default function RegistrarMovimiento() {
   const params = useLocalSearchParams<{ obra: string; titulo?: string; tipo: 'egreso' | 'ingreso' }>();
   const tipo = params.tipo === 'ingreso' ? 'ingreso' : 'egreso';
+  // El ingeniero solo registra gastos de la obra (sin préstamos); el servidor también lo valida.
+  const esIngeniero = useSesion().usuario?.rol_nombre === 'Ingeniero';
   const [control, setControl] = useState<Control | null>(null);
   const [categoria, setCategoria] = useState<string>(tipo === 'egreso' ? 'MAT' : 'ANTICIPO');
   const [dia, setDia] = useState<'0' | '1' | '2'>('0');
@@ -92,7 +95,7 @@ export default function RegistrarMovimiento() {
         <Campo etiqueta="Descripción" value={descripcion} onChangeText={setDescripcion} placeholder={tipo === 'egreso' ? 'Ej. 35 varillas 3/8"' : 'Ej. Pago de estimación 2'} maxLength={255} />
         <Opciones
           etiqueta="Categoría"
-          opciones={CATEGORIAS[tipo].map((c) => ({ valor: c, texto: NOMBRE_CATEGORIA[c] }))}
+          opciones={CATEGORIAS[tipo].filter((c) => !esIngeniero || !NO_COSTO.includes(c)).map((c) => ({ valor: c, texto: NOMBRE_CATEGORIA[c] }))}
           valor={categoria}
           onCambio={setCategoria}
         />

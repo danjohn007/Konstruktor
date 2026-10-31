@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Core\Database;
 use PDO;
 
-/** Instalación: tablas, roles, catálogo de insumos del Excel, cuadrillas, usuario administrador y migraciones pendientes. */
+/** Instalación: tablas, roles (Admin, Cotizador, Ingeniero), catálogo de insumos del Excel, cuadrillas, usuario administrador y migraciones pendientes. */
 class Instalador
 {
     private const CONFIG_LOCAL = __DIR__ . '/../../config.local.php';
@@ -63,7 +63,7 @@ class Instalador
 
         $db = Database::pdo();
 
-        foreach (['Admin', 'Cotizador'] as $rol) {
+        foreach (['Admin', 'Cotizador', 'Ingeniero'] as $rol) {
             $db->prepare('INSERT IGNORE INTO roles (nombre) VALUES (?)')->execute([$rol]);
         }
 

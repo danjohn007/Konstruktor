@@ -53,6 +53,37 @@ try {
 
 $router = new Router();
 
+// Ingeniero (residente de obra): ve las obras aceptadas y registra avance y gastos con sus fotos.
+// Lo que no está aquí le responde 403, así que una ruta nueva queda cerrada para él hasta agregarla.
+const RUTAS_INGENIERO = [
+    'GET /login', 'POST /logout', 'GET /cotizaciones', 'GET /cotizaciones/{id}', 'GET /archivos/{tipo}/{id}',
+    'POST /api/auth/login', 'POST /api/auth/token', 'DELETE /api/auth/token', 'GET /api/auth/yo', 'PUT /api/mi-password',
+    'GET /api/obras', 'GET /api/cotizaciones', 'GET /api/cotizaciones/{id}',
+    'GET /api/cotizaciones/{id}/avance', 'POST /api/cotizaciones/{id}/avances',
+    'PUT /api/avances/{id}', 'DELETE /api/avances/{id}', 'POST /api/avances/{id}/foto',
+    'GET /api/cotizaciones/{id}/control', 'POST /api/cotizaciones/{id}/movimientos', 'PUT /api/movimientos/{id}',
+    'POST /api/movimientos/{id}/comprobante', 'DELETE /api/movimientos/{id}/comprobante',
+];
+$router->guard(function (string $method, string $pattern, array $params): bool {
+    if (!\App\Core\Auth::esIngeniero()) {
+        return true;
+    }
+    $permitida = in_array("$method $pattern", RUTAS_INGENIERO, true);
+    // De las cotizaciones solo ve las aceptadas (las obras), no las que siguen en cotización.
+    if ($permitida && str_contains($pattern, 'cotizaciones/{id}')) {
+        $permitida = CotizacionesController::estado((int) $params[0]) === 'aceptada';
+    }
+    if ($permitida) {
+        return true;
+    }
+    if (str_starts_with($pattern, '/api/')) {
+        \App\Core\Response::json(['error' => 'Tu usuario (Ingeniero) no tiene acceso a esta acción'], 403);
+    } else {
+        header('Location: ' . BASE . '/cotizaciones');
+    }
+    return false;
+});
+
 // --- Páginas web ---
 $router->get('/login', [AuthController::class, 'showLogin']);
 $router->post('/logout', [AuthController::class, 'logout']);

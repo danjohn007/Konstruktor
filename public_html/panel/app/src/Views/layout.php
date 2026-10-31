@@ -4,9 +4,13 @@ $uri = substr(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), strlen(BASE)) ?:
 $isActive = fn(string $path) => $path === '/' ? ($uri === '/' ? 'active' : '') : (str_starts_with($uri, $path) ? 'active' : '');
 $breadcrumb = ($titulo ?? '') === 'Inicio' ? 'Inicio' : 'Inicio / ' . ($titulo ?? '');
 $esAdmin = ($currentUser['rol_nombre'] ?? '') === 'Admin';
+$esIngeniero = ($currentUser['rol_nombre'] ?? '') === 'Ingeniero';
 // Mismos enlaces en la barra lateral (escritorio) y en el menú desplegable (celular).
 ob_start();
 ?>
+      <?php if ($esIngeniero): ?>
+      <a href="cotizaciones" class="<?= $isActive('/cotizaciones') ?>"><i class="bi bi-cone-striped"></i> Obras</a>
+      <?php else: ?>
       <a href="./" class="<?= $isActive('/') ?>"><i class="bi bi-house-door"></i> Inicio</a>
       <a href="cotizaciones" class="<?= $isActive('/cotizaciones') ?>"><i class="bi bi-file-earmark-spreadsheet"></i> Cotizaciones</a>
       <a href="clientes" class="<?= $isActive('/clientes') ?>"><i class="bi bi-people"></i> Clientes</a>
@@ -15,6 +19,7 @@ ob_start();
       <?php if ($esAdmin): ?>
       <a href="usuarios" class="<?= $isActive('/usuarios') ?>"><i class="bi bi-person-lock"></i> Usuarios</a>
       <a href="configuracion" class="<?= $isActive('/configuracion') ?>"><i class="bi bi-gear"></i> Configuración</a>
+      <?php endif; ?>
       <?php endif; ?>
 <?php
 $navLinks = ob_get_clean();

@@ -4,7 +4,7 @@ export type Usuario = {
   id: number;
   nombre: string;
   email: string;
-  rol_nombre: 'Admin' | 'Cotizador' | string;
+  rol_nombre: 'Admin' | 'Cotizador' | 'Ingeniero' | string;
 };
 
 export type Obra = {

@@ -6,6 +6,14 @@ class Router
 {
     private array $routes = [];
 
+    /** fn(string $method, string $pattern, array $params): bool — false si ya respondió que no está permitido. */
+    private $guard = null;
+
+    public function guard(callable $guard): void
+    {
+        $this->guard = $guard;
+    }
+
     public function get(string $pattern, callable|array $handler): void
     {
         $this->add('GET', $pattern, $handler);
@@ -43,6 +51,9 @@ class Router
             $regex = '#^' . $regex . '$#';
             if (preg_match($regex, $uri, $matches)) {
                 array_shift($matches);
+                if ($this->guard && !($this->guard)($method, $route['pattern'], $matches)) {
+                    return;
+                }
                 $handler = $route['handler'];
                 if (is_array($handler)) {
                     [$class, $methodName] = $handler;

@@ -20,7 +20,7 @@ class CotizacionesController
     public function index(): void
     {
         Auth::requireLogin();
-        Response::view('cotizaciones/index', ['user' => Auth::user(), 'titulo' => 'Cotizaciones']);
+        Response::view('cotizaciones/index', ['user' => Auth::user(), 'titulo' => Auth::esIngeniero() ? 'Obras' : 'Cotizaciones']);
     }
 
     public function show(string $id): void
@@ -59,7 +59,9 @@ class CotizacionesController
             $where[] = '(c.folio LIKE ? OR c.obra LIKE ? OR cl.nombre LIKE ?)';
             array_push($params, "%$q%", "%$q%", "%$q%");
         }
-        if (in_array($_GET['estado'] ?? '', self::ESTADOS, true)) {
+        if (Auth::esIngeniero()) {
+            $where[] = "c.estado = 'aceptada'"; // el ingeniero solo ve las obras
+        } elseif (in_array($_GET['estado'] ?? '', self::ESTADOS, true)) {
             $where[] = 'c.estado = ?';
             $params[] = $_GET['estado'];
         }

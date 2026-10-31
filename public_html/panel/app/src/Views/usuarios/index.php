@@ -1,5 +1,5 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <p class="text-muted small mb-0"><strong>Admin</strong>: todo, incluida configuración y eliminaciones. <strong>Cotizador</strong>: cotizaciones, estimaciones, control de obra y catálogos.</p>
+  <p class="text-muted small mb-0"><strong>Admin</strong>: todo, incluida configuración y eliminaciones. <strong>Cotizador</strong>: cotizaciones, estimaciones, control de obra y catálogos. <strong>Ingeniero</strong>: residente de obra; ve las obras aceptadas y registra avance y gastos con fotos (web y app).</p>
   <button class="btn btn-primary" onclick="nuevo()"><i class="bi bi-plus-lg"></i> Nuevo usuario</button>
 </div>
 

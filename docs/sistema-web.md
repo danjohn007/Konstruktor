@@ -191,3 +191,11 @@ Sin `DELIMITER`, procedimientos ni triggers: cada sentencia termina en `;` al fi
 
 - **Admin**: todo, incluida Configuración y eliminar cotizaciones, clientes e insumos.
 - **Cotizador**: cotizaciones, estimaciones, control de obra, clientes, insumos y cuadrillas (sin Configuración, Usuarios ni eliminaciones de catálogo o de movimientos).
+- **Ingeniero** (residente de obra), en la web y en la app:
+  - Solo ve las cotizaciones **aceptadas** (en el menú, *Obras*). En cada una consulta el catálogo, el programa, el avance y el control de obra.
+  - Registra **avance** con foto y **gastos** de la obra con su comprobante. Solo corrige los registros que él hizo.
+  - No ve Inicio, clientes, insumos, cuadrillas, datos generales, estimaciones, flujo ni el presupuesto imprimible.
+  - No registra ingresos, préstamos ni retiros de utilidad.
+  - Los permisos están en `RUTAS_INGENIERO` (`index.php`): una ruta nueva le responde 403 hasta agregarla ahí.
+
+  El rol se agrega solo a las bases existentes (migración `005_rol_ingeniero.sql`). Se le asigna a un usuario en *Usuarios*.

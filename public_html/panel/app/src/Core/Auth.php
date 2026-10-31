@@ -90,12 +90,24 @@ class Auth
         return $user !== null && in_array($user['rol_nombre'], $roles, true);
     }
 
+    /** Residente de obra: solo ve obras aceptadas y registra avance y gastos (ver RUTAS_INGENIERO en index.php). */
+    public static function esIngeniero(): bool
+    {
+        self::refrescar();
+        return self::hasRole('Ingeniero');
+    }
+
     /**
      * Vuelve a leer al usuario en cada petición: si lo desactivaron se cierra su
      * sesión, y si le cambiaron el rol el cambio aplica de inmediato.
      */
     private static function refrescar(): void
     {
+        static $hecho = false;
+        if ($hecho) {
+            return;
+        }
+        $hecho = true;
         $token = self::bearerToken();
         if ($token !== null) {
             self::refrescarToken($token);

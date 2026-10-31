@@ -251,8 +251,9 @@ CREATE TABLE IF NOT EXISTS migraciones (
     error TEXT DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Este esquema ya incluye estas migraciones (y insumos_iniciales.sql los insumos de la 004).
+-- Este esquema ya incluye estas migraciones (insumos_iniciales.sql trae los insumos de la 004 y el instalador crea los roles de la 005).
 INSERT IGNORE INTO migraciones (archivo, aplicada) VALUES
 ('002_fase2_estimaciones_control.sql', NOW()),
 ('003_fase3_app_movil_avance.sql', NOW()),
-('004_fase4_insumos_2024.sql', NOW());
+('004_fase4_insumos_2024.sql', NOW()),
+('005_rol_ingeniero.sql', NOW());

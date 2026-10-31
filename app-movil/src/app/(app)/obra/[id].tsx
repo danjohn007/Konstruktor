@@ -6,6 +6,7 @@ import { AvisoSinSenal, BarraAvance, Boton, Dato, Icono, Insignia, Opciones, Tar
 import { obtener } from '@/lib/api';
 import { usePendientes, type Pendiente } from '@/lib/cola';
 import { fecha, hoyISO, money, numero, pct } from '@/lib/formato';
+import { useSesion } from '@/lib/sesion';
 import { Colores, Espacio } from '@/lib/tema';
 import { NOMBRE_CATEGORIA, type Avance, type Control } from '@/lib/tipos';
 
@@ -191,11 +192,13 @@ function ListaAvance({ avance, nav }: { avance: Avance; nav: Nav }) {
 }
 
 function ListaGastos({ control, nav }: { control: Control; nav: Nav }) {
+  // El ingeniero (residente) registra gastos; los ingresos los lleva la oficina.
+  const esIngeniero = useSesion().usuario?.rol_nombre === 'Ingeniero';
   return (
     <View style={{ gap: Espacio.m }}>
       <View style={s.botones}>
         <Boton titulo="Gasto" icono="minus-circle-outline" onPress={() => router.push({ pathname: '/movimiento', params: { ...nav, tipo: 'egreso' } })} style={{ flex: 1 }} />
-        <Boton titulo="Ingreso" icono="plus-circle-outline" tipo="secundario" onPress={() => router.push({ pathname: '/movimiento', params: { ...nav, tipo: 'ingreso' } })} style={{ flex: 1 }} />
+        {!esIngeniero && <Boton titulo="Ingreso" icono="plus-circle-outline" tipo="secundario" onPress={() => router.push({ pathname: '/movimiento', params: { ...nav, tipo: 'ingreso' } })} style={{ flex: 1 }} />}
       </View>
       {control.movimientos.length === 0 && <Vacio icono="cash-minus" texto="Sin movimientos registrados." />}
       {control.movimientos.map((m) => {

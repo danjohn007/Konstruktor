@@ -50,9 +50,13 @@ class ArchivosController
     {
         Auth::requireLogin();
         $db = Database::pdo();
-        $stmt = $db->prepare('SELECT comprobante FROM movimientos WHERE id = ?');
+        $stmt = $db->prepare('SELECT comprobante, usuario_id FROM movimientos WHERE id = ?');
         $stmt->execute([$id]);
-        Archivos::borrar($stmt->fetchColumn() ?: null);
+        $mov = $stmt->fetch();
+        if ($mov && !$this->puedeCambiar('movimientos', $mov)) {
+            return;
+        }
+        Archivos::borrar($mov['comprobante'] ?? null);
         $db->prepare('UPDATE movimientos SET comprobante = NULL WHERE id = ?')->execute([$id]);
         Response::json(['ok' => true]);
     }
@@ -67,11 +71,14 @@ class ArchivosController
         }
         [$tabla, $columna] = self::TIPOS[$tipo];
         $db = Database::pdo();
-        $stmt = $db->prepare("SELECT $columna FROM $tabla WHERE id = ?");
+        $stmt = $db->prepare("SELECT $columna, usuario_id FROM $tabla WHERE id = ?");
         $stmt->execute([$id]);
         $anterior = $stmt->fetch();
         if (!$anterior) {
             Response::json(['error' => 'Registro no encontrado'], 404);
+            return;
+        }
+        if (!$this->puedeCambiar($tipo, $anterior)) {
             return;
         }
 
@@ -83,5 +90,20 @@ class ArchivosController
         $db->prepare("UPDATE $tabla SET $columna = ? WHERE id = ?")->execute([$ruta, $id]);
         Archivos::borrar($anterior[$columna]);
         Response::json(['ok' => true, 'url' => BASE . "/archivos/$tipo/$id"]);
+    }
+
+    /**
+     * Mismas reglas que el registro: la foto de un avance la cambia quien lo registró o un Admin;
+     * el comprobante de un movimiento, cualquiera de la oficina o el ingeniero que lo registró.
+     */
+    private function puedeCambiar(string $tipo, array $fila): bool
+    {
+        $propio = (int) $fila['usuario_id'] === (int) Auth::user()['id'];
+        $permitido = $tipo === 'avances' ? $propio || Auth::hasRole('Admin') : $propio || !Auth::esIngeniero();
+        if (!$permitido) {
+            Response::json(['error' => 'Solo quien lo registró puede cambiar este archivo'], 403);
+        }
+
+        return $permitido;
     }
 }

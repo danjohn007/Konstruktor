@@ -1,10 +1,11 @@
+<?php $esIngeniero = ($user['rol_nombre'] ?? '') === 'Ingeniero'; // solo ve las obras (aceptadas) ?>
 <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
   <div class="d-flex flex-wrap gap-2">
     <div class="input-group" style="max-width:320px">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
       <input type="text" id="buscar" class="form-control" placeholder="Folio, obra o cliente..." value="<?= htmlspecialchars($_GET['q'] ?? '') ?>">
     </div>
-    <select id="filtroEstado" class="form-select" style="max-width:180px">
+    <select id="filtroEstado" class="form-select<?= $esIngeniero ? ' d-none' : '' ?>" style="max-width:180px">
       <option value="">Todos los estados</option>
       <option value="borrador">Borrador</option>
       <option value="enviada">Enviada</option>
@@ -12,7 +13,9 @@
       <option value="rechazada">Rechazada</option>
     </select>
   </div>
+  <?php if (!$esIngeniero): ?>
   <button class="btn btn-primary" onclick="nueva()"><i class="bi bi-plus-lg"></i> Nueva cotización</button>
+  <?php endif; ?>
 </div>
 
 <div class="card">
