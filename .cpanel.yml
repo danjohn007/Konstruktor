@@ -1,0 +1,10 @@
+# Despliegue con cPanel › Git™ Version Control › "Deploy HEAD Commit".
+# Copia la landing a public_html. Si es un subdominio o addon, cambia DEPLOYPATH
+# (por ejemplo: $HOME/konstruktor.mx/).
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=$HOME/public_html/
+    - /bin/mkdir -p $DEPLOYPATH/assets
+    - /bin/cp index.html 404.html robots.txt .htaccess $DEPLOYPATH
+    - /bin/cp -R assets/. $DEPLOYPATH/assets/

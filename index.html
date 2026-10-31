@@ -1,0 +1,1163 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konstruktor · Constructora con precio cerrado y avance que puedes ver</title>
+<meta name="description" content="Construcción, ampliación y remodelación con presupuesto por precio unitario, programa de obra, reporte fotográfico diario y pagos por avance real. Cotiza tu obra sin costo.">
+<meta property="og:title" content="Konstruktor · Tecnología en la construcción">
+<meta property="og:description" content="Tu obra con precio cerrado, avance diario con fotos y pagos solo por lo construido.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0f2742">
+<link rel="icon" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!--
+  ANTES DE PUBLICAR: edita el objeto CONFIG al final del archivo (WhatsApp, teléfono, correo y zona).
+  Todo lo que dice "Ejemplo ilustrativo" son datos de muestra, no de un cliente real.
+-->
+<style>
+:root {
+    --navy-950: #071526;
+    --navy-900: #0a1d33;
+    --navy: #0f2742;
+    --navy-light: #173a5e;
+    --blue: #2f75b5;
+    --blue-bright: #3d93e8;
+    --blue-soft: #ddebf7;
+    --amber: #f5a524;
+    --amber-dark: #d98a0b;
+    --green: #1f9d6b;
+    --red: #d64545;
+    --ink: #1f2937;
+    --muted: #64708a;
+    --border: #e3e8f0;
+    --bg: #ffffff;
+    --bg-soft: #f4f6fb;
+    --radius: 14px;
+    --shadow: 0 24px 60px -24px rgba(7, 21, 38, .35);
+    --display: "Archivo", "Segoe UI", Roboto, sans-serif;
+    --body: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+h1, h2, h3, h4 { font-family: var(--display); line-height: 1.1; margin: 0; letter-spacing: -.02em; }
+p { margin: 0; }
+
+.container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.section { padding: 112px 0; }
+.section-soft { background: var(--bg-soft); }
+.section-dark { background: var(--navy-900); color: #fff; position: relative; overflow: hidden; }
+
+.eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--display); font-weight: 700; font-size: 13px;
+    text-transform: uppercase; letter-spacing: .14em; color: var(--blue);
+}
+.eyebrow .num { color: var(--amber-dark); }
+.section-dark .eyebrow { color: var(--blue-bright); }
+.section-dark .eyebrow .num { color: var(--amber); }
+.section-head { max-width: 760px; margin-bottom: 56px; }
+.section-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+.section-head h2 { font-size: clamp(32px, 4.4vw, 52px); font-weight: 800; margin: 14px 0 18px; }
+.section-head p { font-size: 18px; color: var(--muted); }
+.section-dark .section-head p { color: rgba(255, 255, 255, .68); }
+.hl { color: var(--blue); }
+.section-dark .hl, .hero .hl { color: var(--amber); }
+
+/* Botones */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 15px 26px; border-radius: 10px; border: 0; cursor: pointer;
+    font-family: var(--display); font-weight: 700; font-size: 16px; text-decoration: none;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn-primary { background: var(--amber); color: var(--navy-950); box-shadow: 0 12px 30px -10px rgba(245, 165, 36, .7); }
+.btn-primary:hover { background: #ffb53d; }
+.btn-ghost { background: rgba(255, 255, 255, .08); color: #fff; border: 1px solid rgba(255, 255, 255, .22); }
+.btn-ghost:hover { background: rgba(255, 255, 255, .14); }
+.btn-dark { background: var(--navy); color: #fff; }
+.btn-dark:hover { background: var(--navy-light); }
+.btn svg { width: 18px; height: 18px; }
+
+/* Header */
+.topbar {
+    background: var(--navy-950); color: rgba(255, 255, 255, .75); font-size: 13px;
+}
+.topbar .container { display: flex; justify-content: space-between; align-items: center; height: 38px; gap: 16px; }
+.topbar a { text-decoration: none; color: #fff; font-weight: 600; }
+.topbar-zone { display: flex; align-items: center; gap: 8px; }
+.topbar-zone::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px rgba(31, 157, 107, .25); }
+
+.header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255, 255, 255, .92); backdrop-filter: saturate(160%) blur(12px);
+    border-bottom: 1px solid var(--border);
+}
+.header .container { display: flex; align-items: center; justify-content: space-between; height: 76px; gap: 24px; }
+.brand img { height: 50px; width: auto; }
+.nav { display: flex; align-items: center; gap: 30px; }
+.nav a { text-decoration: none; font-weight: 600; font-size: 15px; color: var(--ink); position: relative; }
+.nav a:not(.btn)::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 2px;
+    background: var(--amber); transform: scaleX(0); transition: transform .2s ease;
+}
+.nav a:not(.btn):hover::after { transform: scaleX(1); }
+.nav .btn { padding: 11px 20px; font-size: 15px; }
+.menu-toggle { display: none; background: none; border: 0; padding: 8px; cursor: pointer; color: var(--navy); }
+.menu-toggle svg { width: 28px; height: 28px; }
+
+/* Hero */
+.hero {
+    position: relative; overflow: hidden; color: #fff;
+    background:
+        radial-gradient(900px 500px at 85% 20%, rgba(61, 147, 232, .28), transparent 60%),
+        radial-gradient(700px 400px at 0% 100%, rgba(245, 165, 36, .12), transparent 60%),
+        var(--navy-900);
+    padding: 88px 0 120px;
+}
+.blueprint::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, .045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .045) 1px, transparent 1px),
+        linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
+    background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+    mask-image: linear-gradient(180deg, #000 30%, transparent 100%);
+}
+.blueprint > .container { position: relative; }
+.hero .container { position: relative; display: grid; grid-template-columns: 1.02fr 1fr; gap: 64px; align-items: center; }
+.hero-badge {
+    display: inline-flex; align-items: center; gap: 10px; padding: 7px 14px 7px 8px;
+    border-radius: 999px; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14);
+    font-size: 14px; font-weight: 600; color: rgba(255, 255, 255, .9);
+}
+.hero-badge b { background: var(--amber); color: var(--navy-950); padding: 2px 10px; border-radius: 999px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.hero h1 { font-size: clamp(40px, 5.6vw, 70px); font-weight: 900; margin: 26px 0 24px; letter-spacing: -.03em; }
+.hero-sub { font-size: 19px; color: rgba(255, 255, 255, .76); max-width: 580px; }
+.hero-sub strong { color: #fff; }
+.hero-ctas { display: flex; flex-wrap: wrap; gap: 14px; margin: 36px 0 34px; }
+.hero-checks { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; padding: 0; margin: 0; list-style: none; max-width: 560px; }
+.hero-checks li { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; font-weight: 500; color: rgba(255, 255, 255, .88); }
+.check { flex: none; width: 22px; height: 22px; border-radius: 50%; background: rgba(31, 157, 107, .2); color: #3ddc97; display: grid; place-items: center; margin-top: 1px; }
+.check svg { width: 13px; height: 13px; }
+
+/* Mockup de panel */
+.mock-wrap { position: relative; }
+.mock {
+    background: #fff; color: var(--ink); border-radius: 18px; box-shadow: 0 40px 100px -30px rgba(0, 0, 0, .6);
+    overflow: hidden; border: 1px solid rgba(255, 255, 255, .5);
+}
+.mock-bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: #eef2f8; border-bottom: 1px solid var(--border); }
+.mock-bar i { width: 10px; height: 10px; border-radius: 50%; background: #cfd6e2; }
+.mock-bar span { margin-left: 10px; font-size: 12px; color: var(--muted); background: #fff; border-radius: 6px; padding: 3px 12px; }
+.mock-body { padding: 20px; }
+.mock-title { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+.mock-title small { display: block; color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+.mock-title strong { font-family: var(--display); font-size: 18px; }
+.pill { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.pill-green { background: #dcf5ea; color: #137a51; }
+.pill-blue { background: var(--blue-soft); color: var(--blue); }
+.pill-amber { background: #fdf0d8; color: #a2650a; }
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.kpi { background: var(--bg-soft); border-radius: 10px; padding: 12px; }
+.kpi small { display: block; font-size: 11px; color: var(--muted); font-weight: 600; }
+.kpi b { font-family: var(--display); font-size: 20px; display: block; margin: 2px 0; }
+.kpi em { font-style: normal; font-size: 11px; font-weight: 700; color: var(--green); }
+.bars { display: grid; gap: 10px; }
+.bar-row { display: grid; grid-template-columns: 110px 1fr 40px; gap: 10px; align-items: center; font-size: 13px; }
+.bar-row span:first-child { color: var(--muted); font-weight: 500; }
+.bar-row b { text-align: right; font-size: 13px; }
+.bar { height: 8px; background: #e8edf5; border-radius: 99px; position: relative; overflow: hidden; }
+.bar i { position: absolute; inset: 0 auto 0 0; width: 0; background: linear-gradient(90deg, var(--blue), var(--blue-bright)); border-radius: 99px; transition: width 1.4s cubic-bezier(.2, .8, .2, 1); }
+.bar i.done { background: linear-gradient(90deg, #179a64, #2bc184); }
+.mock-caption { margin-top: 14px; font-size: 11px; color: rgba(255, 255, 255, .5); text-align: right; }
+.doc-scroll { overflow-x: auto; }
+
+.toast {
+    position: absolute; display: flex; gap: 12px; align-items: center;
+    background: #fff; color: var(--ink); border-radius: 12px; padding: 11px 14px;
+    box-shadow: 0 20px 40px -14px rgba(0, 0, 0, .5); font-size: 13px; line-height: 1.35;
+    animation: float 6s ease-in-out infinite;
+}
+.toast b { display: block; font-size: 13px; }
+.toast small { color: var(--muted); }
+.toast .ico { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; flex: none; }
+.toast .ico svg { width: 18px; height: 18px; }
+.toast-1 { left: -44px; bottom: -6px; }
+.toast-2 { right: -26px; top: 64px; animation-delay: -2s; }
+.toast-3 { right: -26px; top: -34px; animation-delay: -4s; }
+.mock-wrap { padding-bottom: 28px; }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+/* Franja de entregables */
+.strip { background: var(--amber); color: var(--navy-950); overflow: hidden; border-top: 1px solid rgba(0, 0, 0, .06); }
+.strip-track { display: flex; width: max-content; animation: marquee 38s linear infinite; }
+.strip-track span {
+    display: inline-flex; align-items: center; gap: 18px; padding: 18px 0 18px 18px;
+    font-family: var(--display); font-weight: 800; font-size: 17px; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap;
+}
+.strip-track span::after { content: "✦"; font-size: 13px; opacity: .55; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* Problema / solución */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.compare-col { border-radius: var(--radius); padding: 36px; }
+.compare-col h3 { font-size: 22px; display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+.compare-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.compare-col li { display: flex; gap: 14px; font-size: 16px; }
+.compare-col li .mk { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; margin-top: 1px; }
+.compare-col li .mk svg { width: 13px; height: 13px; }
+.compare-bad { background: #fff; border: 1px solid var(--border); }
+.compare-bad h3 { color: var(--red); }
+.compare-bad li { color: var(--muted); }
+.compare-bad .mk { background: #fde6e6; color: var(--red); }
+.compare-good { background: var(--navy); color: #fff; box-shadow: var(--shadow); position: relative; }
+.compare-good h3 { color: #fff; }
+.compare-good li { color: rgba(255, 255, 255, .88); }
+.compare-good li b { color: #fff; }
+.compare-good .mk { background: rgba(61, 220, 151, .16); color: #3ddc97; }
+.compare-good::before {
+    content: "Así trabajamos"; position: absolute; top: -13px; right: 28px;
+    background: var(--amber); color: var(--navy-950); font-family: var(--display); font-weight: 800;
+    font-size: 12px; text-transform: uppercase; letter-spacing: .08em; padding: 5px 12px; border-radius: 99px;
+}
+
+/* Servicios */
+.services { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.service {
+    position: relative; background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 32px 28px 28px; transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    display: flex; flex-direction: column;
+}
+.service:hover { transform: translateY(-6px); box-shadow: var(--shadow); border-color: transparent; }
+.service .idx { position: absolute; top: 24px; right: 26px; font-family: var(--display); font-weight: 800; font-size: 14px; color: #c3cad8; }
+.service .ico { width: 56px; height: 56px; border-radius: 14px; background: var(--blue-soft); color: var(--blue); display: grid; place-items: center; margin-bottom: 22px; transition: background .25s, color .25s; }
+.service:hover .ico { background: var(--navy); color: var(--amber); }
+.service .ico svg { width: 28px; height: 28px; }
+.service small { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--amber-dark); }
+.service h3 { font-size: 22px; margin: 6px 0 10px; }
+.service p { color: var(--muted); font-size: 15px; }
+.service .apps { margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--border); font-size: 13px; color: var(--ink); flex: 1; }
+.service .apps b { color: var(--navy); }
+.service a.more { margin-top: 18px; font-weight: 700; font-size: 14px; color: var(--blue); text-decoration: none; }
+.service a.more:hover { text-decoration: underline; }
+
+.callout {
+    margin-top: 32px; display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    background: linear-gradient(110deg, var(--navy) 0%, var(--navy-light) 100%); color: #fff;
+    border-radius: var(--radius); padding: 30px 36px; position: relative; overflow: hidden;
+}
+.callout h3 { font-size: 24px; margin-bottom: 6px; }
+.callout p { color: rgba(255, 255, 255, .72); }
+.callout .btn { flex: none; position: relative; }
+
+/* Tecnología */
+.tech-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 64px; align-items: start; position: relative; }
+.doc {
+    background: #fff; color: var(--ink); border-radius: 14px; box-shadow: 0 40px 90px -30px rgba(0, 0, 0, .65);
+    overflow: hidden; font-size: 12.5px;
+}
+.doc-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-bottom: 2px solid var(--navy); gap: 12px; }
+.doc-head img { height: 34px; }
+.doc-head div { text-align: right; }
+.doc-head small { display: block; color: var(--muted); font-size: 11px; }
+.doc-head b { font-family: var(--display); font-size: 15px; }
+.doc table { width: 100%; border-collapse: collapse; }
+.doc th { text-align: left; background: var(--navy); color: #fff; font-weight: 600; font-size: 11px; padding: 8px 10px; text-transform: uppercase; letter-spacing: .04em; }
+.doc td { padding: 9px 10px; border-bottom: 1px solid #eef1f6; vertical-align: top; }
+.doc td.n, .doc th.n { text-align: right; white-space: nowrap; }
+.doc tr.open td { background: #f3f8fd; }
+.doc tr.apu td { background: #f3f8fd; padding-top: 0; }
+.apu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.apu-grid div { background: #fff; border: 1px solid #d9e6f3; border-radius: 6px; padding: 6px 8px; }
+.apu-grid small { display: block; color: var(--muted); font-size: 10px; }
+.apu-grid b { font-size: 12px; }
+.doc-foot { display: flex; justify-content: space-between; padding: 14px 20px; background: var(--bg-soft); font-weight: 700; }
+.doc-foot span:last-child { font-family: var(--display); font-size: 16px; }
+.doc-note { margin-top: 12px; font-size: 11px; color: rgba(255, 255, 255, .45); }
+
+.cycle { list-style: none; margin: 0; padding: 0; position: relative; }
+.cycle::before { content: ""; position: absolute; left: 23px; top: 24px; bottom: 24px; width: 2px; background: linear-gradient(var(--blue-bright), var(--amber)); opacity: .5; }
+.cycle li { display: grid; grid-template-columns: 48px 1fr; gap: 20px; padding: 0 0 30px; position: relative; }
+.cycle li:last-child { padding-bottom: 0; }
+.cycle .step {
+    width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center;
+    background: var(--navy); border: 1px solid rgba(255, 255, 255, .2); color: var(--amber);
+    font-family: var(--display); font-weight: 800; font-size: 17px; position: relative;
+}
+.cycle h3 { font-size: 20px; margin: 4px 0 6px; }
+.cycle p { color: rgba(255, 255, 255, .68); font-size: 15px; }
+.cycle .tag { display: inline-block; margin-top: 8px; font-size: 12px; font-weight: 700; color: var(--blue-bright); background: rgba(61, 147, 232, .12); padding: 3px 10px; border-radius: 99px; }
+
+.offline {
+    margin-top: 72px; display: grid; grid-template-columns: auto 1fr; gap: 48px; align-items: center;
+    background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .1); border-radius: 20px; padding: 40px 48px;
+}
+.phone {
+    width: 230px; border-radius: 34px; padding: 10px; background: #0b0f17; box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .7);
+    border: 1px solid rgba(255, 255, 255, .15);
+}
+.phone-screen { background: #f4f6fb; border-radius: 26px; overflow: hidden; color: var(--ink); font-size: 12px; }
+.phone-top { background: var(--navy); color: #fff; padding: 22px 16px 14px; }
+.phone-top small { opacity: .65; font-size: 11px; }
+.phone-top b { display: block; font-family: var(--display); font-size: 15px; }
+.phone-body { padding: 12px; display: grid; gap: 8px; }
+.phone-card { background: #fff; border-radius: 10px; padding: 10px; border: 1px solid var(--border); }
+.phone-card small { color: var(--muted); font-size: 10px; display: block; }
+.phone-photo {
+    height: 74px; border-radius: 8px; margin-top: 6px; position: relative; overflow: hidden;
+    background:
+        repeating-linear-gradient(0deg, transparent 0 13px, rgba(255, 255, 255, .5) 13px 15px),
+        repeating-linear-gradient(90deg, transparent 0 28px, rgba(255, 255, 255, .5) 28px 30px),
+        linear-gradient(160deg, #9fb2c8, #6d8199);
+}
+.phone-photo::after { content: "📷 08:42"; position: absolute; right: 6px; bottom: 5px; font-size: 10px; color: #fff; background: rgba(0, 0, 0, .45); padding: 1px 6px; border-radius: 4px; }
+.phone-btn { background: var(--amber); color: var(--navy-950); text-align: center; font-weight: 800; padding: 9px; border-radius: 9px; font-family: var(--display); }
+.phone-queue { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: #a2650a; background: #fdf0d8; padding: 6px 8px; border-radius: 8px; }
+.offline h3 { font-size: clamp(26px, 3vw, 36px); margin-bottom: 14px; }
+.offline p { color: rgba(255, 255, 255, .7); font-size: 17px; max-width: 560px; }
+.offline-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.offline-list span { font-size: 14px; font-weight: 600; padding: 8px 14px; border-radius: 99px; background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .12); }
+
+/* Cifras */
+.stats { background: var(--navy-950); color: #fff; padding: 64px 0; position: relative; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.stat { padding: 8px 24px; border-left: 2px solid rgba(245, 165, 36, .6); }
+.stat b { display: block; font-family: var(--display); font-weight: 900; font-size: clamp(38px, 4.4vw, 56px); line-height: 1; color: #fff; }
+.stat b sup { font-size: .45em; color: var(--amber); vertical-align: top; margin-left: 2px; }
+.stat > span { display: block; margin-top: 10px; color: rgba(255, 255, 255, .65); font-size: 15px; }
+
+/* Proceso */
+.process { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; counter-reset: p; position: relative; }
+.process::before { content: ""; position: absolute; top: 31px; left: 10%; right: 10%; height: 2px; background: repeating-linear-gradient(90deg, var(--blue) 0 10px, transparent 10px 18px); opacity: .4; }
+.pstep { position: relative; text-align: left; }
+.pstep .dot {
+    width: 64px; height: 64px; border-radius: 18px; background: #fff; border: 2px solid var(--navy);
+    display: grid; place-items: center; font-family: var(--display); font-weight: 900; font-size: 22px; color: var(--navy);
+    margin-bottom: 20px; position: relative; box-shadow: 0 10px 24px -12px rgba(15, 39, 66, .4);
+}
+.pstep:first-child .dot { background: var(--amber); border-color: var(--amber); }
+.pstep:last-child .dot { background: var(--navy); color: var(--amber); }
+.pstep h3 { font-size: 18px; margin-bottom: 8px; }
+.pstep p { color: var(--muted); font-size: 14.5px; }
+.pstep .deliv { display: inline-block; margin-top: 12px; font-size: 12px; font-weight: 700; color: var(--navy); background: var(--blue-soft); padding: 4px 10px; border-radius: 6px; }
+
+/* Garantías */
+.why { display: grid; grid-template-columns: 1fr 1.25fr; gap: 64px; align-items: center; }
+.why-visual {
+    position: relative; border-radius: 22px; overflow: hidden; min-height: 520px; color: #fff;
+    background: linear-gradient(160deg, var(--navy-light), var(--navy-950));
+    padding: 40px; display: flex; flex-direction: column; justify-content: flex-end;
+}
+.why-visual svg.building { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .9; }
+.why-visual .quote { position: relative; font-family: var(--display); font-size: 30px; font-weight: 800; line-height: 1.15; }
+.why-visual .quote span { color: var(--amber); }
+.why-visual small { position: relative; display: block; margin-top: 14px; color: rgba(255, 255, 255, .7); font-size: 15px; }
+.guarantees { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 32px; }
+.g h3 { font-size: 19px; margin: 14px 0 6px; }
+.g p { color: var(--muted); font-size: 15px; }
+.g .ico { width: 46px; height: 46px; border-radius: 12px; background: #fdf0d8; color: var(--amber-dark); display: grid; place-items: center; }
+.g .ico svg { width: 24px; height: 24px; }
+
+/* FAQ */
+.faq { max-width: 860px; margin: 0 auto; display: grid; gap: 12px; }
+.faq details { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 0 24px; transition: box-shadow .2s; }
+.faq details[open] { box-shadow: 0 16px 40px -24px rgba(15, 39, 66, .35); border-color: #cfdbea; }
+.faq summary { cursor: pointer; list-style: none; padding: 22px 0; font-family: var(--display); font-weight: 700; font-size: 18px; display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--bg-soft); display: grid; place-items: center; font-size: 22px; color: var(--blue); transition: transform .25s; }
+.faq details[open] summary::after { transform: rotate(45deg); background: var(--amber); color: var(--navy-950); }
+.faq details p { padding: 0 0 22px; color: var(--muted); }
+
+/* CTA + formulario */
+.cta-section {
+    position: relative; overflow: hidden; color: #fff;
+    background: radial-gradient(800px 500px at 100% 0%, rgba(61, 147, 232, .25), transparent 60%), var(--navy-900);
+}
+.cta-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 64px; align-items: start; position: relative; }
+.cta-copy h2 { font-size: clamp(34px, 4.4vw, 54px); font-weight: 900; margin: 14px 0 18px; }
+.cta-copy > p { color: rgba(255, 255, 255, .72); font-size: 18px; }
+.cta-points { list-style: none; padding: 0; margin: 32px 0; display: grid; gap: 16px; }
+.cta-points li { display: flex; gap: 14px; align-items: flex-start; }
+.cta-points li b { display: block; }
+.cta-points li span.t { color: rgba(255, 255, 255, .65); font-size: 15px; }
+.contact-direct { display: flex; flex-wrap: wrap; gap: 12px; }
+.contact-direct a { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; padding: 12px 18px; border-radius: 10px; background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .14); font-weight: 600; }
+.contact-direct a:hover { background: rgba(255, 255, 255, .12); }
+.contact-direct svg { width: 18px; height: 18px; }
+
+.form-card { background: #fff; color: var(--ink); border-radius: 20px; padding: 36px; box-shadow: 0 40px 100px -30px rgba(0, 0, 0, .7); }
+.form-card h3 { font-size: 24px; }
+.form-card h3 + p { color: var(--muted); font-size: 15px; margin: 6px 0 24px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.field { display: grid; gap: 6px; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-size: 13px; font-weight: 700; color: var(--navy); }
+.field label i { color: var(--red); font-style: normal; }
+.field input, .field select, .field textarea {
+    width: 100%; font: inherit; font-size: 15px; color: var(--ink); background: var(--bg-soft);
+    border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; transition: border-color .2s, background .2s;
+}
+.field textarea { min-height: 96px; resize: vertical; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--blue); background: #fff; }
+.field .hint { font-size: 12px; color: var(--muted); }
+.field.invalid input, .field.invalid select { border-color: var(--red); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips label { cursor: pointer; }
+.chips input { position: absolute; opacity: 0; pointer-events: none; }
+.chips span { display: inline-block; padding: 9px 14px; border-radius: 99px; border: 1.5px solid var(--border); font-size: 14px; font-weight: 600; color: var(--ink); background: var(--bg-soft); transition: all .15s; }
+.chips input:checked + span { background: var(--navy); border-color: var(--navy); color: #fff; }
+.chips input:focus-visible + span { outline: 2px solid var(--blue); outline-offset: 2px; }
+.form-card .btn { width: 100%; margin-top: 22px; font-size: 17px; padding: 17px; }
+.form-legal { margin-top: 12px; font-size: 12px; color: var(--muted); text-align: center; }
+.form-ok { display: none; text-align: center; padding: 40px 10px; }
+.form-ok .big { width: 72px; height: 72px; border-radius: 50%; background: #dcf5ea; color: var(--green); display: grid; place-items: center; margin: 0 auto 18px; }
+.form-ok .big svg { width: 36px; height: 36px; }
+.form-ok h3 { margin-bottom: 8px; }
+.form-ok p { color: var(--muted); }
+
+/* Footer */
+.footer { background: var(--navy-950); color: rgba(255, 255, 255, .65); padding: 72px 0 32px; font-size: 15px; }
+.footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 40px; }
+.footer-logo { background: #fff; display: inline-block; padding: 10px 14px; border-radius: 10px; margin-bottom: 18px; }
+.footer-logo img { height: 44px; }
+.footer h4 { color: #fff; font-size: 15px; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 18px; }
+.footer ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.footer a { text-decoration: none; }
+.footer a:hover { color: #fff; }
+.footer-bottom { margin-top: 56px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, .1); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; }
+
+.wa-float {
+    position: fixed; right: 22px; bottom: 22px; z-index: 60; width: 60px; height: 60px; border-radius: 50%;
+    background: #25d366; color: #fff; display: grid; place-items: center; box-shadow: 0 14px 30px -8px rgba(37, 211, 102, .7);
+    transition: transform .2s;
+}
+.wa-float:hover { transform: scale(1.08); }
+.wa-float svg { width: 32px; height: 32px; }
+.wa-float::before { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 2px solid #25d366; animation: ping 2.4s ease-out infinite; }
+@keyframes ping { from { transform: scale(1); opacity: .8; } to { transform: scale(1.6); opacity: 0; } }
+
+/* Aparición al hacer scroll */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s ease, transform .8s cubic-bezier(.2, .8, .2, 1); }
+.reveal.in { opacity: 1; transform: none; }
+.d1 { transition-delay: .08s; } .d2 { transition-delay: .16s; } .d3 { transition-delay: .24s; } .d4 { transition-delay: .32s; } .d5 { transition-delay: .4s; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .reveal { opacity: 1; transform: none; }
+    html { scroll-behavior: auto; }
+}
+
+/* Responsivo */
+@media (max-width: 1080px) {
+    .hero .container, .tech-grid, .why, .cta-grid { grid-template-columns: 1fr; gap: 56px; }
+    .mock-wrap { max-width: 620px; margin: 0 auto; width: 100%; }
+    .services { grid-template-columns: 1fr 1fr; }
+    .process { grid-template-columns: 1fr 1fr 1fr; row-gap: 40px; }
+    .process::before { display: none; }
+    .stats-grid { grid-template-columns: 1fr 1fr; row-gap: 36px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .why-visual { min-height: 380px; }
+}
+@media (max-width: 860px) {
+    .nav {
+        position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; align-items: stretch; gap: 0;
+        background: #fff; border-bottom: 1px solid var(--border); padding: 8px 24px 20px;
+        transform: translateY(-12px); opacity: 0; pointer-events: none; transition: all .2s;
+        box-shadow: 0 20px 30px -20px rgba(0, 0, 0, .3);
+    }
+    .nav.open { transform: none; opacity: 1; pointer-events: auto; }
+    .nav a:not(.btn) { padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .nav .btn { margin-top: 16px; }
+    .menu-toggle { display: block; }
+    .compare { grid-template-columns: 1fr; }
+    .offline { grid-template-columns: 1fr; padding: 32px 24px; justify-items: center; text-align: left; }
+    .callout { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 640px) {
+    .container { padding: 0 16px; }
+    .section { padding: 80px 0; }
+    .topbar-zone { display: none; }
+    .topbar .container { justify-content: center; }
+    .header .container { height: 68px; }
+    .brand img { height: 42px; }
+    .hero { padding: 56px 0 96px; }
+    .hero-checks { grid-template-columns: 1fr; }
+    .hero-ctas .btn { width: 100%; }
+    .kpis { grid-template-columns: 1fr 1fr; }
+    .kpis .kpi:last-child { grid-column: 1 / -1; }
+    .bar-row { grid-template-columns: 88px 1fr 36px; font-size: 12px; }
+    .toast-1 { left: -6px; bottom: -10px; }
+    .toast-2, .toast-3 { display: none; }
+    .hero-ctas .btn-ghost { display: none; }
+    .services, .guarantees, .process, .form-grid { grid-template-columns: 1fr; }
+    .compare-col { padding: 28px 22px; }
+    .doc { font-size: 11px; }
+    .doc .hide-sm { display: none; }
+    .apu-grid { grid-template-columns: 1fr 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+    .stat { padding: 4px 14px; }
+    .form-card { padding: 26px 20px; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .why-visual { padding: 28px; }
+    .why-visual .quote { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="container">
+        <span class="topbar-zone">Agenda abierta para obras en <span data-config="zona"></span></span>
+        <span>Atención directa · <a href="#" data-config-tel></a></span>
+    </div>
+</div>
+
+<header class="header">
+    <div class="container">
+        <a class="brand" href="#inicio" aria-label="Konstruktor, inicio"><img src="assets/logo.png" alt="Konstruktor · Tecnología en la construcción" width="300" height="116"></a>
+        <nav class="nav" id="nav">
+            <a href="#servicios">Servicios</a>
+            <a href="#control">Control de obra</a>
+            <a href="#proceso">Cómo trabajamos</a>
+            <a href="#garantias">Garantías</a>
+            <a href="#preguntas">Preguntas</a>
+            <a class="btn btn-primary" href="#cotizar">Cotiza tu obra</a>
+        </nav>
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+    </div>
+</header>
+
+<main id="inicio">
+
+<!-- HERO -->
+<section class="hero blueprint">
+    <div class="container">
+        <div>
+            <span class="hero-badge reveal"><b>Constructora</b> Tecnología en la construcción</span>
+            <h1 class="reveal d1">Tu obra con <span class="hl">precio cerrado</span> y avance que puedes ver.</h1>
+            <p class="hero-sub reveal d2">Construimos, ampliamos y remodelamos con un sistema propio de control de obra: <strong>presupuesto desglosado concepto por concepto</strong>, programa semanal, reporte fotográfico diario y <strong>pagos solo por lo que ya está construido</strong>.</p>
+            <div class="hero-ctas reveal d3">
+                <a class="btn btn-primary" href="#cotizar">
+                    Cotiza tu obra sin costo
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </a>
+                <a class="btn btn-ghost" href="#control">Ver cómo controlamos tu obra</a>
+            </div>
+            <ul class="hero-checks reveal d4">
+                <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span>Presupuesto por precio unitario</li>
+                <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span>Pagas por avance real</li>
+                <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span>Fotos del avance todos los días</li>
+                <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span>Precio pactado en contrato</li>
+            </ul>
+        </div>
+
+        <div class="mock-wrap reveal d2">
+            <div class="mock" aria-hidden="true">
+                <div class="mock-bar"><i></i><i></i><i></i><span>Panel de obra · Konstruktor</span></div>
+                <div class="mock-body">
+                    <div class="mock-title">
+                        <div><small>KON-26-014 · SEMANA 9 DE 16</small><strong>Casa habitación 2 niveles</strong></div>
+                        <span class="pill pill-green">● En tiempo</span>
+                    </div>
+                    <div class="kpis">
+                        <div class="kpi"><small>Avance real</small><b><span data-count="64">0</span>%</b><em>▲ +3 pts vs programa</em></div>
+                        <div class="kpi"><small>Contratado</small><b>$1.28 M</b><em style="color:var(--muted)">Precio fijo</em></div>
+                        <div class="kpi"><small>Estimado y pagado</small><b>$742 k</b><em style="color:var(--muted)">4 estimaciones</em></div>
+                    </div>
+                    <div class="bars">
+                        <div class="bar-row"><span>Cimentación</span><div class="bar"><i class="done" data-w="100"></i></div><b>100%</b></div>
+                        <div class="bar-row"><span>Estructura</span><div class="bar"><i class="done" data-w="100"></i></div><b>100%</b></div>
+                        <div class="bar-row"><span>Muros</span><div class="bar"><i data-w="82"></i></div><b>82%</b></div>
+                        <div class="bar-row"><span>Instalaciones</span><div class="bar"><i data-w="46"></i></div><b>46%</b></div>
+                        <div class="bar-row"><span>Acabados</span><div class="bar"><i data-w="9"></i></div><b>9%</b></div>
+                    </div>
+                </div>
+            </div>
+            <div class="toast toast-1" aria-hidden="true">
+                <span class="ico" style="background:#e3effb;color:var(--blue)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span>
+                <div><b>Avance registrado con foto</b><small>Muro de block · 24 m² · 08:42</small></div>
+            </div>
+            <div class="toast toast-2" aria-hidden="true">
+                <span class="ico" style="background:#dcf5ea;color:var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span>
+                <div><b>Estimación #4 autorizada</b><small>Pagas solo lo construido</small></div>
+            </div>
+            <div class="toast toast-3" aria-hidden="true">
+                <span class="ico" style="background:#fdf0d8;color:var(--amber-dark)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></span>
+                <div><b>Semana 9: en tiempo</b><small>Real 64% · programado 61%</small></div>
+            </div>
+            <p class="mock-caption">Ejemplo ilustrativo del panel de control de obra</p>
+        </div>
+    </div>
+</section>
+
+<!-- ENTREGABLES -->
+<div class="strip" aria-label="Lo que incluye cada obra">
+    <div class="strip-track">
+        <span>Presupuesto por P.U.</span><span>Números generadores</span><span>Programa de obra</span><span>Explosión de insumos</span><span>Estimaciones con carátula</span><span>Reporte fotográfico diario</span><span>Control de gastos</span><span>Flujo de efectivo</span>
+        <span aria-hidden="true">Presupuesto por P.U.</span><span aria-hidden="true">Números generadores</span><span aria-hidden="true">Programa de obra</span><span aria-hidden="true">Explosión de insumos</span><span aria-hidden="true">Estimaciones con carátula</span><span aria-hidden="true">Reporte fotográfico diario</span><span aria-hidden="true">Control de gastos</span><span aria-hidden="true">Flujo de efectivo</span>
+    </div>
+</div>
+
+<!-- PROBLEMA / SOLUCIÓN -->
+<section class="section section-soft">
+    <div class="container">
+        <div class="section-head center reveal">
+            <span class="eyebrow">El problema</span>
+            <h2>Una obra sin control <span class="hl">se paga dos veces.</span></h2>
+            <p>Presupuestos “a ojo”, anticipos que se esfuman, precios que cambian a media obra y cuentas que nadie explica. Así se encarece una construcción. Nosotros lo resolvemos con método y números.</p>
+        </div>
+        <div class="compare">
+            <div class="compare-col compare-bad reveal">
+                <h3>
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>
+                    Con el contratista de siempre
+                </h3>
+                <ul>
+                    <li><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>Un presupuesto de una sola línea, sin desglose de material ni mano de obra.</li>
+                    <li><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>Pagos por adelantado sin saber cuánto se ha construido en realidad.</li>
+                    <li><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>El precio “sube” a media obra y no hay forma de comprobar por qué.</li>
+                    <li><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>Si no vas a la obra, no sabes qué se hizo esta semana.</li>
+                    <li><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>Material que se compra de más, se pierde o llega tarde.</li>
+                    <li><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>Fechas de entrega que nadie programó y nadie cumple.</li>
+                </ul>
+            </div>
+            <div class="compare-col compare-good reveal d2">
+                <h3>
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f5a524" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>
+                    Con Konstruktor
+                </h3>
+                <ul>
+                    <li><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span><span><b>Cada concepto con análisis de precio unitario:</b> material, mano de obra y equipo.</span></li>
+                    <li><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span><span><b>Pagas por estimaciones del avance real,</b> con el anticipo amortizado en cada una.</span></li>
+                    <li><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span><span><b>Catálogo y precios quedan fijos al firmar:</b> ese es el contrato.</span></li>
+                    <li><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span><span><b>Reporte con fotos desde la obra,</b> registrado el mismo día.</span></li>
+                    <li><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span><span><b>Explosión de insumos:</b> se compra lo que el presupuesto indica, semana por semana.</span></li>
+                    <li><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span><span><b>Programa de obra:</b> avance real contra programado, a la vista.</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SERVICIOS -->
+<section class="section" id="servicios">
+    <div class="container">
+        <div class="section-head reveal">
+            <span class="eyebrow"><span class="num">01</span> / Servicios</span>
+            <h2>Una sola constructora para <span class="hl">toda tu obra.</span></h2>
+            <p>Desde la cimentación hasta la última mano de pintura. Un solo presupuesto, un solo programa y un solo responsable.</p>
+        </div>
+        <div class="services">
+            <article class="service reveal">
+                <span class="idx">01</span>
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg></span>
+                <small>Obra nueva</small>
+                <h3>Casa habitación y locales</h3>
+                <p>Construcción completa llave en mano, del terreno a la entrega de llaves.</p>
+                <div class="apps"><b>Ideal para:</b> vivienda, locales comerciales, bodegas y oficinas.</div>
+                <a class="more" href="#cotizar" data-servicio="Obra nueva">Cotizar obra nueva →</a>
+            </article>
+            <article class="service reveal d1">
+                <span class="idx">02</span>
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V10l6-5 6 5v11"/><path d="M16 13h4v8h-4"/><path d="M18 9v2M17 10h2"/><path d="M8 21v-5h4v5"/></svg></span>
+                <small>Crecimiento</small>
+                <h3>Ampliaciones y remodelación</h3>
+                <p>Segundos niveles, cuartos adicionales, cocinas, baños y cambios de distribución.</p>
+                <div class="apps"><b>Ideal para:</b> casas que crecen con la familia o el negocio.</div>
+                <a class="more" href="#cotizar" data-servicio="Ampliación o remodelación">Cotizar ampliación →</a>
+            </article>
+            <article class="service reveal d2">
+                <span class="idx">03</span>
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9h18M3 14.5h18M9 4v5M15 9v5.5M9 14.5V20"/></svg></span>
+                <small>Obra negra</small>
+                <h3>Estructura y obra civil</h3>
+                <p>Cimentación, cimbra, castillos, cadenas, losas y muros. Estructura metálica con IPR y PTR.</p>
+                <div class="apps"><b>Ideal para:</b> arrancar bien desde abajo, con generadores de cada volumen.</div>
+                <a class="more" href="#cotizar" data-servicio="Obra negra y estructura">Cotizar obra negra →</a>
+            </article>
+            <article class="service reveal">
+                <span class="idx">04</span>
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3c2.5 3.2 4 5.5 4 7.5a4 4 0 0 1-8 0C4 8.5 5.5 6.2 8 3z"/><path d="M15 3l-2 7h4l-3 8"/><path d="M14 21h7"/></svg></span>
+                <small>Instalaciones</small>
+                <h3>Hidrosanitarias y eléctricas</h3>
+                <p>Tinacos, cisternas, tubería hidráulica, drenaje, cableado, contactos y centros de carga.</p>
+                <div class="apps"><b>Ideal para:</b> obra nueva o renovar instalaciones viejas.</div>
+                <a class="more" href="#cotizar" data-servicio="Instalaciones">Cotizar instalaciones →</a>
+            </article>
+            <article class="service reveal d1">
+                <span class="idx">05</span>
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/><path d="M3 17.5l9 5 9-5" opacity=".6"/></svg></span>
+                <small>Construcción ligera</small>
+                <h3>Tablaroca y Durock</h3>
+                <p>Muros divisorios, plafones, fachadas ligeras y áreas húmedas en tiempos cortos.</p>
+                <div class="apps"><b>Ideal para:</b> oficinas, locales y adecuaciones rápidas.</div>
+                <a class="more" href="#cotizar" data-servicio="Tablaroca y Durock">Cotizar tablaroca →</a>
+            </article>
+            <article class="service reveal d2">
+                <span class="idx">06</span>
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M12 3v18M4 12h16"/></svg></span>
+                <small>Terminados</small>
+                <h3>Herrería, aluminio y acabados</h3>
+                <p>Ventanas y cancelería de aluminio, puertas, protecciones, pisos y pintura.</p>
+                <div class="apps"><b>Ideal para:</b> cerrar la obra con calidad que se nota.</div>
+                <a class="more" href="#cotizar" data-servicio="Herrería, aluminio y acabados">Cotizar acabados →</a>
+            </article>
+        </div>
+        <div class="callout reveal">
+            <div>
+                <h3>¿Tu proyecto combina varias especialidades?</h3>
+                <p>Coordinamos todo con un solo presupuesto, un solo programa de obra y un solo responsable.</p>
+            </div>
+            <a class="btn btn-primary" href="#cotizar">Hablar con un especialista</a>
+        </div>
+    </div>
+</section>
+
+<!-- CONTROL DE OBRA / TECNOLOGÍA -->
+<section class="section section-dark blueprint" id="control">
+    <div class="container">
+        <div class="section-head reveal" style="position:relative">
+            <span class="eyebrow"><span class="num">02</span> / Tecnología en la construcción</span>
+            <h2>El control de obra que <span class="hl">otras constructoras no te muestran.</span></h2>
+            <p>Desarrollamos nuestro propio sistema de presupuestos y control de obra. Lo que en otros lados vive en una libreta, aquí está en un sistema que calcula, registra y documenta cada peso de tu obra.</p>
+        </div>
+        <div class="tech-grid">
+            <div class="reveal">
+                <div class="doc" aria-hidden="true">
+                    <div class="doc-head">
+                        <img src="assets/logo.png" alt="">
+                        <div><small>PRESUPUESTO</small><b>KON-26-014</b></div>
+                    </div>
+                    <div class="doc-scroll"><table>
+                        <thead><tr><th>Clave</th><th>Concepto</th><th class="hide-sm">Unidad</th><th class="n hide-sm">Cantidad</th><th class="n">P.U.</th><th class="n">Importe</th></tr></thead>
+                        <tbody>
+                            <tr class="open"><td>1.01</td><td>Muro de block 15x20x40 cm asentado con mortero</td><td class="hide-sm">m²</td><td class="n hide-sm">186.00</td><td class="n">$689.40</td><td class="n">$128,228.40</td></tr>
+                            <tr class="apu"><td></td><td colspan="5">
+                                <div class="apu-grid">
+                                    <div><small>Materiales</small><b>$412.18</b></div>
+                                    <div><small>Mano de obra</small><b>$214.60</b></div>
+                                    <div><small>Equipo y herr.</small><b>$18.30</b></div>
+                                    <div><small>Indirectos y utilidad</small><b>$44.32</b></div>
+                                </div>
+                            </td></tr>
+                            <tr><td>1.02</td><td>Castillo armado 15x15 cm, 4 var. 3/8"</td><td class="hide-sm">ml</td><td class="n hide-sm">96.00</td><td class="n">$412.75</td><td class="n">$39,624.00</td></tr>
+                            <tr><td>1.03</td><td>Cadena de cerramiento 15x20 cm</td><td class="hide-sm">ml</td><td class="n hide-sm">74.50</td><td class="n">$455.30</td><td class="n">$33,919.85</td></tr>
+                            <tr><td>2.01</td><td>Losa maciza de concreto f'c=200 kg/cm², 10 cm</td><td class="hide-sm">m²</td><td class="n hide-sm">92.00</td><td class="n">$1,286.90</td><td class="n">$118,394.80</td></tr>
+                            <tr><td>3.04</td><td>Salida hidráulica con tubería de 1/2"</td><td class="hide-sm">sal</td><td class="n hide-sm">14.00</td><td class="n">$1,145.00</td><td class="n">$16,030.00</td></tr>
+                        </tbody>
+                    </table></div>
+                    <div class="doc-foot"><span>Subtotal (extracto)</span><span>$336,197.05</span></div>
+                </div>
+                <p class="doc-note">Ejemplo ilustrativo. Así se ve cada concepto de tu presupuesto: con cantidad, precio unitario y su análisis.</p>
+            </div>
+
+            <ol class="cycle">
+                <li class="reveal"><span class="step">1</span><div><h3>Presupuesto por precio unitario</h3><p>Cada concepto con su análisis de material, mano de obra y equipo, y sus números generadores. Sabes exactamente qué pagas.</p><span class="tag">Folio y PDF del presupuesto</span></div></li>
+                <li class="reveal d1"><span class="step">2</span><div><h3>Programa de obra</h3><p>Fechas de inicio y término por concepto, con el importe programado de cada semana. Sabes cuándo se hace cada cosa.</p><span class="tag">Calendario semanal</span></div></li>
+                <li class="reveal d2"><span class="step">3</span><div><h3>Avance diario con foto</h3><p>El residente registra desde la obra lo ejecutado cada día, con evidencia fotográfica, contra lo programado.</p><span class="tag">Reporte fotográfico</span></div></li>
+                <li class="reveal d3"><span class="step">4</span><div><h3>Estimación y pago</h3><p>Pagas por lo construido: cada estimación muestra lo anterior, lo actual, lo acumulado y la amortización del anticipo.</p><span class="tag">Carátula con firmas</span></div></li>
+                <li class="reveal d4"><span class="step">5</span><div><h3>Entrega con números cerrados</h3><p>Al terminar recibes el estado de cuenta final y la memoria fotográfica de tu obra, de principio a fin.</p><span class="tag">Expediente de obra</span></div></li>
+            </ol>
+        </div>
+
+        <div class="offline reveal">
+            <div class="phone" aria-hidden="true">
+                <div class="phone-screen">
+                    <div class="phone-top"><small>KON-26-014 · Avance</small><b>Registrar avance del día</b></div>
+                    <div class="phone-body">
+                        <div class="phone-card"><small>Concepto</small><b>1.01 Muro de block 15x20x40</b></div>
+                        <div class="phone-card"><small>Cantidad ejecutada hoy</small><b>24.00 m²</b></div>
+                        <div class="phone-card"><small>Evidencia</small><div class="phone-photo"></div></div>
+                        <div class="phone-queue">● Sin señal · se enviará al reconectar</div>
+                        <div class="phone-btn">Guardar avance</div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <span class="eyebrow">App de obra</span>
+                <h3 style="margin-top:12px">¿Sin señal en la obra? <span class="hl">No se pierde nada.</span></h3>
+                <p>Nuestro personal registra avance, gastos y fotos desde el celular aunque no haya internet. Todo se guarda en el teléfono y se envía solo al recuperar la conexión, sin duplicados. Por eso el reporte de tu obra está al día.</p>
+                <div class="offline-list">
+                    <span>Avance por concepto</span><span>Foto de cada trabajo</span><span>Gasto ligado a su concepto</span><span>Foto de tickets y facturas</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CIFRAS -->
+<section class="stats" aria-label="Konstruktor en números">
+    <div class="container stats-grid">
+        <div class="stat reveal"><b><span data-count="300">0</span><sup>+</sup></b><span>insumos con precio actualizado en nuestro catálogo</span></div>
+        <div class="stat reveal d1"><b><span data-count="100">0</span><sup>%</sup></b><span>de los conceptos con análisis de precio unitario</span></div>
+        <div class="stat reveal d2"><b>1<sup>×</sup></b><span>precio: el que firmas en tu contrato</span></div>
+        <div class="stat reveal d3"><b>Diario</b><span>registro de avance con evidencia fotográfica</span></div>
+    </div>
+</section>
+
+<!-- PROCESO -->
+<section class="section" id="proceso">
+    <div class="container">
+        <div class="section-head center reveal">
+            <span class="eyebrow"><span class="num">03</span> / Cómo trabajamos</span>
+            <h2>De la primera visita a la <span class="hl">entrega de llaves.</span></h2>
+            <p>Un proceso claro, con un entregable en cada etapa. Sin letras chiquitas.</p>
+        </div>
+        <div class="process">
+            <div class="pstep reveal"><div class="dot">1</div><h3>Visita y levantamiento</h3><p>Conocemos tu terreno o inmueble, medimos y escuchamos lo que necesitas.</p><span class="deliv">Sin costo</span></div>
+            <div class="pstep reveal d1"><div class="dot">2</div><h3>Presupuesto detallado</h3><p>Catálogo de conceptos, precios unitarios, generadores y programa de obra.</p><span class="deliv">Presupuesto con folio</span></div>
+            <div class="pstep reveal d2"><div class="dot">3</div><h3>Contrato y anticipo</h3><p>El catálogo y los precios aprobados quedan fijos. Arrancamos en la fecha pactada.</p><span class="deliv">Precio cerrado</span></div>
+            <div class="pstep reveal d3"><div class="dot">4</div><h3>Ejecución con reporte</h3><p>Avance diario con fotos y estimaciones periódicas por lo construido.</p><span class="deliv">Estimaciones</span></div>
+            <div class="pstep reveal d4"><div class="dot">5</div><h3>Entrega y cierre</h3><p>Recorrido final, estado de cuenta y memoria fotográfica de tu obra.</p><span class="deliv">Expediente de obra</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- GARANTÍAS -->
+<section class="section section-soft" id="garantias">
+    <div class="container why">
+        <div class="why-visual reveal" aria-hidden="false">
+            <svg class="building" viewBox="0 0 400 520" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <defs>
+                    <pattern id="g" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="rgba(255,255,255,.06)"/></pattern>
+                </defs>
+                <rect width="400" height="520" fill="url(#g)"/>
+                <g fill="none" stroke="rgba(120,180,240,.55)" stroke-width="1.5">
+                    <path d="M60 470V200l140-90 140 90v270"/>
+                    <path d="M60 200h280M60 290h280M60 380h280"/>
+                    <path d="M130 470V155M200 470V110M270 470V155"/>
+                    <rect x="88" y="222" width="28" height="44"/><rect x="152" y="222" width="28" height="44"/><rect x="220" y="222" width="28" height="44"/><rect x="284" y="222" width="28" height="44"/>
+                    <rect x="88" y="312" width="28" height="44"/><rect x="152" y="312" width="28" height="44"/><rect x="220" y="312" width="28" height="44"/><rect x="284" y="312" width="28" height="44"/>
+                    <rect x="176" y="400" width="48" height="70"/>
+                </g>
+                <path d="M30 470h340" stroke="#f5a524" stroke-width="3"/>
+                <g stroke="#f5a524" stroke-width="2" fill="none">
+                    <path d="M352 470V60M352 60H230M352 60l30 0M352 90l-28-30M352 120l-28-30"/>
+                    <path d="M240 60v40" stroke-dasharray="4 4"/>
+                    <rect x="230" y="100" width="20" height="14" fill="#f5a524"/>
+                </g>
+                <g font-family="Archivo, sans-serif" font-size="11" fill="rgba(255,255,255,.55)">
+                    <text x="60" y="490">0.00</text><text x="300" y="490">12.00 m</text>
+                </g>
+            </svg>
+            <p class="quote">“Lo que firmas es <span>lo que pagas.</span> Y ves en qué se va cada peso.”</p>
+            <small>Nuestro compromiso con cada cliente</small>
+        </div>
+        <div>
+            <div class="section-head reveal" style="margin-bottom:40px">
+                <span class="eyebrow"><span class="num">04</span> / Por qué Konstruktor</span>
+                <h2>Garantías que <span class="hl">se notan en tu bolsillo.</span></h2>
+            </div>
+            <div class="guarantees">
+                <div class="g reveal"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span><h3>Precio blindado</h3><p>Al aceptar el presupuesto, catálogo y precios quedan fijos. Solo cambia lo que tú autorices.</p></div>
+                <div class="g reveal d1"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><h3>Pagas lo construido</h3><p>Anticipo y estimaciones por avance real medido. Nunca pagas obra que no existe.</p></div>
+                <div class="g reveal"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span><h3>Evidencia diaria</h3><p>Cada avance se registra con foto el mismo día. Ves tu obra aunque estés lejos.</p></div>
+                <div class="g reveal d1"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg></span><h3>Todo por escrito</h3><p>Presupuesto con folio, programa de obra, estimaciones con carátula y factura con IVA desglosado.</p></div>
+                <div class="g reveal"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c2.8.2 5 2.5 5 5.3"/></svg></span><h3>Cuadrillas formales</h3><p>Mano de obra presupuestada con prestaciones de ley. Sin sorpresas laborales para ti.</p></div>
+                <div class="g reveal d1"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><h3>Tiempos medidos</h3><p>Avance real contra programado cada semana: si algo se atrasa, lo sabes y lo corregimos.</p></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="preguntas">
+    <div class="container">
+        <div class="section-head center reveal">
+            <span class="eyebrow"><span class="num">05</span> / Preguntas frecuentes</span>
+            <h2>Lo que todos preguntan <span class="hl">antes de construir.</span></h2>
+        </div>
+        <div class="faq reveal">
+            <details open>
+                <summary>¿La cotización tiene costo?</summary>
+                <p>No. La visita de levantamiento y el presupuesto detallado no tienen costo ni compromiso. Recibes el catálogo de conceptos con precios unitarios para que compares con cualquier otra propuesta.</p>
+            </details>
+            <details>
+                <summary>¿Qué pasa si sube el precio del material a mitad de obra?</summary>
+                <p>Al aceptar el presupuesto, el catálogo, las cantidades y los precios unitarios quedan fijos: ese es el contrato. Solo se ajusta lo que tú pidas cambiar o agregar, y siempre con un presupuesto por escrito antes de hacerlo.</p>
+            </details>
+            <details>
+                <summary>¿Cómo se paga la obra?</summary>
+                <p>Con un anticipo al iniciar y estimaciones periódicas por el avance real medido. En cada estimación se descuenta la parte proporcional del anticipo, así que siempre sabes cuánto has pagado, cuánto se ha construido y cuánto falta.</p>
+            </details>
+            <details>
+                <summary>No puedo ir seguido a la obra, ¿cómo sé cómo va?</summary>
+                <p>Nuestro residente registra el avance diario con fotos desde la obra. Te compartimos el reporte con el avance real contra el programado, para que sepas cómo va tu obra sin tener que estar ahí.</p>
+            </details>
+            <details>
+                <summary>¿Trabajan con planos de mi arquitecto?</summary>
+                <p>Sí. Presupuestamos sobre tu proyecto ejecutivo con los volúmenes de cada concepto. Si aún no tienes planos, cuéntanos tu idea y te orientamos sobre el siguiente paso.</p>
+            </details>
+            <details>
+                <summary>¿Facturan?</summary>
+                <p>Sí. Presupuestos y estimaciones llevan el IVA desglosado y emitimos factura por cada pago.</p>
+            </details>
+            <details>
+                <summary>¿En qué zona trabajan?</summary>
+                <p>Atendemos obras en <span data-config="zona"></span>. Si tu obra está fuera de esta zona, escríbenos y lo revisamos.</p>
+            </details>
+        </div>
+    </div>
+</section>
+
+<!-- CTA + FORMULARIO -->
+<section class="section cta-section blueprint" id="cotizar">
+    <div class="container cta-grid">
+        <div class="cta-copy reveal">
+            <span class="eyebrow"><span class="num">06</span> / Cotiza tu obra</span>
+            <h2>Construye con números claros <span class="hl">desde el día uno.</span></h2>
+            <p>Cuéntanos de tu proyecto y te contactamos para agendar la visita. Recibe un presupuesto detallado, sin costo y sin compromiso.</p>
+            <ul class="cta-points">
+                <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span><div><b>Respuesta rápida</b><span class="t">Te contactamos por WhatsApp para agendar la visita.</span></div></li>
+                <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span><div><b>Presupuesto comparable</b><span class="t">Concepto por concepto, para que compares con cualquier propuesta.</span></div></li>
+                <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span><div><b>Sin compromiso</b><span class="t">Decides con toda la información en la mano.</span></div></li>
+            </ul>
+            <div class="contact-direct">
+                <a href="#" data-config-wa><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.3-.5.1-1 .1-1.7-.1a15 15 0 0 1-6.9-6c-.5-.7-1-1.6-1-2.6s.5-1.5.8-1.8c.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.3.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.2.5.1.6 0l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg>Escríbenos por WhatsApp</a>
+                <a href="#" data-config-tel-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Llámanos</a>
+            </div>
+        </div>
+
+        <div class="form-card reveal d2">
+            <form id="quoteForm" novalidate>
+                <h3>Solicita tu presupuesto</h3>
+                <p>Toma menos de 1 minuto. Los campos con <span style="color:var(--red)">*</span> son obligatorios.</p>
+                <div class="form-grid">
+                    <div class="field full">
+                        <label>Tipo de obra <i>*</i></label>
+                        <div class="chips" id="tipoChips">
+                            <label><input type="radio" name="tipo" value="Obra nueva" required><span>Obra nueva</span></label>
+                            <label><input type="radio" name="tipo" value="Ampliación o remodelación"><span>Ampliación / remodelación</span></label>
+                            <label><input type="radio" name="tipo" value="Obra negra y estructura"><span>Obra negra</span></label>
+                            <label><input type="radio" name="tipo" value="Instalaciones"><span>Instalaciones</span></label>
+                            <label><input type="radio" name="tipo" value="Tablaroca y Durock"><span>Tablaroca</span></label>
+                            <label><input type="radio" name="tipo" value="Herrería, aluminio y acabados"><span>Acabados</span></label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="f-nombre">Nombre <i>*</i></label>
+                        <input id="f-nombre" name="nombre" autocomplete="name" required>
+                    </div>
+                    <div class="field">
+                        <label for="f-tel">WhatsApp <i>*</i></label>
+                        <input id="f-tel" name="telefono" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="10 dígitos" pattern="[0-9 ]{10,14}" required>
+                    </div>
+                    <div class="field">
+                        <label for="f-ubicacion">Ubicación de la obra <i>*</i></label>
+                        <input id="f-ubicacion" name="ubicacion" placeholder="Colonia y municipio" required>
+                    </div>
+                    <div class="field">
+                        <label for="f-m2">Superficie aproximada</label>
+                        <input id="f-m2" name="superficie" placeholder="Ej. 120 m²">
+                    </div>
+                    <div class="field">
+                        <label for="f-inicio">¿Cuándo quieres iniciar?</label>
+                        <select id="f-inicio" name="inicio">
+                            <option>Lo antes posible</option>
+                            <option>En 1 a 3 meses</option>
+                            <option>En 3 a 6 meses</option>
+                            <option>Solo estoy cotizando</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="f-planos">¿Tienes planos?</label>
+                        <select id="f-planos" name="planos">
+                            <option>Sí, tengo planos</option>
+                            <option>Están en proceso</option>
+                            <option>Todavía no</option>
+                        </select>
+                    </div>
+                    <div class="field full">
+                        <label for="f-desc">Cuéntanos de tu proyecto</label>
+                        <textarea id="f-desc" name="descripcion" placeholder="Ej. Quiero construir un segundo nivel con 2 recámaras y un baño."></textarea>
+                    </div>
+                </div>
+                <button class="btn btn-primary" type="submit">
+                    Enviar solicitud por WhatsApp
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </button>
+                <p class="form-legal">Usaremos tus datos solo para contactarte sobre tu presupuesto.</p>
+            </form>
+            <div class="form-ok" id="formOk" role="status">
+                <div class="big"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></div>
+                <h3>¡Listo! Ya casi está.</h3>
+                <p>Se abrió WhatsApp con los datos de tu obra. Solo presiona enviar y te contactamos muy pronto.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <span class="footer-logo"><img src="assets/logo.png" alt="Konstruktor"></span>
+                <p>Constructora con presupuesto por precio unitario, programa de obra, reporte fotográfico diario y pagos por avance real.</p>
+            </div>
+            <div>
+                <h4>Servicios</h4>
+                <ul>
+                    <li><a href="#servicios">Obra nueva</a></li>
+                    <li><a href="#servicios">Ampliaciones y remodelación</a></li>
+                    <li><a href="#servicios">Obra negra y estructura</a></li>
+                    <li><a href="#servicios">Instalaciones</a></li>
+                    <li><a href="#servicios">Tablaroca y acabados</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Konstruktor</h4>
+                <ul>
+                    <li><a href="#control">Control de obra</a></li>
+                    <li><a href="#proceso">Cómo trabajamos</a></li>
+                    <li><a href="#garantias">Garantías</a></li>
+                    <li><a href="#preguntas">Preguntas frecuentes</a></li>
+                    <li><a href="#cotizar">Cotiza tu obra</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Contacto</h4>
+                <ul>
+                    <li><a href="#" data-config-tel-link><span data-config-tel></span></a></li>
+                    <li><a href="#" data-config-mail><span data-config="email"></span></a></li>
+                    <li><span data-config="zona"></span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© <span id="year">2026</span> Konstruktor · Tecnología en la construcción. Todos los derechos reservados.</span>
+            <span>Aviso de privacidad</span>
+        </div>
+    </div>
+</footer>
+
+<a class="wa-float" href="#" data-config-wa aria-label="Escríbenos por WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.3-.5.1-1 .1-1.7-.1a15 15 0 0 1-6.9-6c-.5-.7-1-1.6-1-2.6s.5-1.5.8-1.8c.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.3.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.2.5.1.6 0l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg>
+</a>
+
+<script>
+// Datos de contacto: cámbialos aquí y se actualizan en toda la página.
+const CONFIG = {
+    whatsapp: '520000000000',              // 52 + 10 dígitos, sin espacios ni +
+    telefono: '00 0000 0000',              // como se muestra en la página
+    email: 'contacto@konstruktor.mx',
+    zona: 'tu ciudad y zona metropolitana',
+    mensajeWhatsApp: 'Hola Konstruktor, quiero cotizar una obra.'
+};
+
+const waLink = (texto) => `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(texto)}`;
+
+document.querySelectorAll('[data-config]').forEach(el => { el.textContent = CONFIG[el.dataset.config]; });
+document.querySelectorAll('[data-config-tel]').forEach(el => { el.textContent = CONFIG.telefono; });
+document.querySelectorAll('a[data-config-tel], a[data-config-tel-link]').forEach(a => { a.href = 'tel:+' + CONFIG.whatsapp; });
+document.querySelectorAll('a[data-config-mail]').forEach(a => { a.href = 'mailto:' + CONFIG.email; });
+document.querySelectorAll('a[data-config-wa]').forEach(a => {
+    a.href = waLink(CONFIG.mensajeWhatsApp);
+    a.target = '_blank';
+    a.rel = 'noopener';
+});
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// Menú móvil
+const nav = document.getElementById('nav');
+const toggle = document.getElementById('menuToggle');
+toggle.addEventListener('click', () => {
+    const open = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open);
+});
+nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    nav.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+}));
+
+// Animaciones al entrar en pantalla: aparición, barras de avance y contadores
+const animateCount = (el) => {
+    const target = +el.dataset.count;
+    const start = performance.now();
+    const step = (now) => {
+        const t = Math.min((now - start) / 1400, 1);
+        el.textContent = Math.round(target * (1 - Math.pow(1 - t, 3)));
+        if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+};
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        el.classList.add('in');
+        el.querySelectorAll('[data-w]').forEach(bar => { bar.style.width = bar.dataset.w + '%'; });
+        el.querySelectorAll('[data-count]').forEach(animateCount);
+        observer.unobserve(el);
+    });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Los enlaces "Cotizar ..." de cada servicio preseleccionan el tipo de obra
+document.querySelectorAll('[data-servicio]').forEach(a => a.addEventListener('click', () => {
+    const radio = document.querySelector(`input[name="tipo"][value="${a.dataset.servicio}"]`);
+    if (radio) radio.checked = true;
+}));
+
+// El formulario arma el mensaje y abre WhatsApp con los datos de la obra
+const form = document.getElementById('quoteForm');
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let valido = true;
+    form.querySelectorAll('[required]').forEach(input => {
+        const field = input.closest('.field');
+        const ok = input.type === 'radio'
+            ? !!form.querySelector(`input[name="${input.name}"]:checked`)
+            : input.checkValidity() && input.value.trim() !== '';
+        field.classList.toggle('invalid', !ok);
+        if (!ok) valido = false;
+    });
+    if (!valido) {
+        form.querySelector('.invalid').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+    const d = Object.fromEntries(new FormData(form));
+    const texto = [
+        'Hola Konstruktor, quiero cotizar una obra.',
+        '',
+        `*Tipo de obra:* ${d.tipo}`,
+        `*Nombre:* ${d.nombre}`,
+        `*WhatsApp:* ${d.telefono}`,
+        `*Ubicación:* ${d.ubicacion}`,
+        d.superficie ? `*Superficie:* ${d.superficie}` : '',
+        `*Inicio:* ${d.inicio}`,
+        `*Planos:* ${d.planos}`,
+        d.descripcion ? `*Proyecto:* ${d.descripcion}` : ''
+    ].filter(Boolean).join('\n');
+    window.open(waLink(texto), '_blank', 'noopener');
+    form.style.display = 'none';
+    document.getElementById('formOk').style.display = 'block';
+});
+form.addEventListener('input', (e) => {
+    const field = e.target.closest('.field');
+    if (field) field.classList.remove('invalid');
+});
+</script>
+</body>
+</html>
