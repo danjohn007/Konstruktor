@@ -199,3 +199,18 @@ Sin `DELIMITER`, procedimientos ni triggers: cada sentencia termina en `;` al fi
   - Los permisos están en `RUTAS_INGENIERO` (`index.php`): una ruta nueva le responde 403 hasta agregarla ahí.
 
   El rol se agrega solo a las bases existentes (migración `005_rol_ingeniero.sql`). Se le asigna a un usuario en *Usuarios*.
+
+## Diseño
+
+- **Colores:** variables en `assets/css/app.css` (`--navy-*`, `--brand-*` y los de estado). Los colores de Bootstrap se toman de ahí.
+- **Tipografía:** Inter.
+- **Estructura** al estilo de ID-Hub:
+  - barra lateral navy con grupos;
+  - barra superior fija con menú de usuario;
+  - tarjetas `.kpi` (ícono, etiqueta, valor y nota);
+  - pestañas subrayadas con `.cuenta`;
+  - filtros rápidos `.chip`.
+- **Gráficas:** ECharts.
+  - Una vista las pide con `'graficas' => true`.
+  - Se dibujan con `grafica(id, opciones)` de `assets/js/app.js`, que ya trae la paleta, los ejes en pesos (`ejeMontos()`) y el redibujado al cambiar de tamaño.
+- **Scripts de las vistas:** `app.js` carga **después** del contenido. Un script de vista no puede usar sus constantes (`COLORES`…) fuera de `DOMContentLoaded`, ni declarar funciones con el mismo nombre.

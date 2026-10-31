@@ -1,28 +1,25 @@
 <?php $esIngeniero = ($user['rol_nombre'] ?? '') === 'Ingeniero'; // solo ve las obras (aceptadas) ?>
-<div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
-  <div class="d-flex flex-wrap gap-2">
-    <div class="input-group" style="max-width:320px">
-      <span class="input-group-text"><i class="bi bi-search"></i></span>
-      <input type="text" id="buscar" class="form-control" placeholder="Folio, obra o cliente..." value="<?= htmlspecialchars($_GET['q'] ?? '') ?>">
-    </div>
-    <select id="filtroEstado" class="form-select<?= $esIngeniero ? ' d-none' : '' ?>" style="max-width:180px">
-      <option value="">Todos los estados</option>
-      <option value="borrador">Borrador</option>
-      <option value="enviada">Enviada</option>
-      <option value="aceptada">Aceptada</option>
-      <option value="rechazada">Rechazada</option>
-    </select>
-  </div>
-  <?php if (!$esIngeniero): ?>
-  <button class="btn btn-primary" onclick="nueva()"><i class="bi bi-plus-lg"></i> Nueva cotización</button>
-  <?php endif; ?>
-</div>
-
 <div class="card">
+  <?php if (!$esIngeniero): ?>
+  <div class="px-3 pt-2">
+    <ul class="nav nav-tabs nav-tabs-scroll" id="tabsEstado">
+      <?php foreach (['' => 'Todas', 'borrador' => 'Borrador', 'enviada' => 'Enviadas', 'aceptada' => 'Aceptadas (obras)', 'rechazada' => 'Rechazadas'] as $valor => $etiqueta): ?>
+      <li class="nav-item"><button class="nav-link" type="button" data-estado="<?= $valor ?>"><?= $etiqueta ?> <span class="cuenta" data-cuenta="<?= $valor ?>">–</span></button></li>
+      <?php endforeach; ?>
+    </ul>
+  </div>
+  <?php endif; ?>
+  <div class="filtros">
+    <div class="buscador"><i class="bi bi-search"></i><input type="text" id="buscar" class="form-control" placeholder="Folio, obra o cliente…" value="<?= htmlspecialchars($_GET['q'] ?? '') ?>"></div>
+    <span class="small text-muted" id="sumaLista"></span>
+    <?php if (!$esIngeniero): ?>
+    <button class="btn btn-primary ms-auto" onclick="nueva()"><i class="bi bi-plus-lg"></i> Nueva cotización</button>
+    <?php endif; ?>
+  </div>
   <div class="table-responsive">
   <table class="table mb-0">
     <thead><tr><th>Folio</th><th>Obra</th><th>Cliente</th><th>Fecha</th><th>Estado</th><th class="num">Subtotal</th><th class="num">Total con IVA</th></tr></thead>
-    <tbody id="tabla"><tr><td colspan="7" class="text-muted">Cargando…</td></tr></tbody>
+    <tbody id="tabla"><tr><td colspan="7" class="vacio-tabla">Cargando…</td></tr></tbody>
   </table>
   </div>
 </div>
@@ -54,24 +51,36 @@
 
 <script>
 let modal;
+let cotizaciones = [];
+let estado = new URLSearchParams(location.search).get('estado') || '';
 
 document.addEventListener('DOMContentLoaded', () => {
     modal = new bootstrap.Modal(document.getElementById('modalNueva'));
-    cargar();
+    document.querySelectorAll('#tabsEstado [data-estado]').forEach((b) => b.addEventListener('click', () => { estado = b.dataset.estado; pintar(); }));
     document.getElementById('buscar').addEventListener('input', debounce(cargar, 300));
-    document.getElementById('filtroEstado').addEventListener('change', cargar);
     document.getElementById('formNueva').addEventListener('submit', crear);
+    cargar();
 });
 
+/** La búsqueda va al servidor; las pestañas de estado filtran en el navegador para mostrar sus cuentas. */
 async function cargar() {
-    const qs = new URLSearchParams({ q: document.getElementById('buscar').value, estado: document.getElementById('filtroEstado').value });
-    const data = await api('api/cotizaciones?' + qs);
+    cotizaciones = await api('api/cotizaciones?' + new URLSearchParams({ q: document.getElementById('buscar').value }));
+    const cuenta = (e) => cotizaciones.filter((c) => !e || c.estado === e).length;
+    document.querySelectorAll('[data-cuenta]').forEach((el) => { el.textContent = cuenta(el.dataset.cuenta); });
+    pintar();
+}
+
+function pintar() {
+    document.querySelectorAll('#tabsEstado [data-estado]').forEach((b) => b.classList.toggle('active', b.dataset.estado === estado));
+    const data = cotizaciones.filter((c) => !estado || c.estado === estado);
+    const suma = data.reduce((s, c) => s + Number(c.total), 0);
+    document.getElementById('sumaLista').textContent = data.length ? `${data.length} · ${money(suma)} con IVA` : '';
     const tb = document.getElementById('tabla');
-    tb.innerHTML = data.length ? '' : '<tr><td colspan="7" class="text-muted">Sin cotizaciones</td></tr>';
+    tb.innerHTML = data.length ? '' : '<tr><td colspan="7" class="vacio-tabla"><i class="bi bi-file-earmark-spreadsheet"></i>Sin cotizaciones</td></tr>';
     data.forEach((c) => {
         const tr = document.createElement('tr');
-        tr.style.cursor = 'pointer';
-        tr.innerHTML = `<td class="text-nowrap">${esc(c.folio)}</td><td>${esc(c.obra)}</td><td>${esc(c.cliente)}</td><td>${fecha(c.fecha_cotizacion)}</td>
+        tr.className = 'fila-click';
+        tr.innerHTML = `<td class="text-nowrap fw-semibold">${esc(c.folio)}</td><td>${esc(c.obra)}</td><td class="text-muted">${esc(c.cliente || '—')}</td><td class="text-nowrap">${fecha(c.fecha_cotizacion)}</td>
             <td><span class="badge estado-${esc(c.estado)}">${esc(c.estado)}</span></td><td class="num">${money(c.subtotal)}</td><td class="num fw-semibold">${money(c.total)}</td>`;
         tr.addEventListener('click', () => { window.location.href = 'cotizaciones/' + c.id; });
         tb.appendChild(tr);

@@ -26,6 +26,7 @@ class EstimacionesController
         Response::view('estimaciones/detalle', [
             'user' => Auth::user(),
             'titulo' => 'Estimación ' . $est['numero'] . ' · ' . $est['cotizacion']['folio'],
+            'migas' => ['Cotizaciones' => 'cotizaciones', $est['cotizacion']['folio'] => 'cotizaciones/' . (int) $est['cotizacion']['id']],
             'estimacionId' => (int) $id,
         ]);
     }

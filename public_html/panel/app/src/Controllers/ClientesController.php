@@ -14,7 +14,7 @@ class ClientesController
     public function index(): void
     {
         Auth::requireLogin();
-        Response::view('clientes/index', ['user' => Auth::user(), 'titulo' => 'Clientes']);
+        Response::view('clientes/index', ['user' => Auth::user(), 'titulo' => 'Clientes', 'subtitulo' => 'Datos de contacto y facturación de quienes te encargan obra']);
     }
 
     public function apiIndex(): void

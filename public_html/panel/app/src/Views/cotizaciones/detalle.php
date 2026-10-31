@@ -138,15 +138,19 @@ $soloOficina = $esIngeniero ? ' d-none' : '';
         <tbody id="tablaAvance"></tbody>
       </table>
     </div></div>
+    <div class="card mb-3" id="cardCurvaS">
+      <div class="card-titulo"><div><h3>Curva de avance</h3><p>Importe acumulado por semana: lo programado, lo ejecutado (cantidad × P.U.) y lo gastado</p></div></div>
+      <div class="p-3"><div class="grafica" id="gCurvaS"></div></div>
+    </div>
     <h6>Resumen por semana</h6>
-    <div class="card mb-3"><div class="table-responsive">
+    <div class="card mb-3"><div class="table-responsive tabla-alta">
       <table class="table table-sm mb-0">
         <thead><tr><th>Semana</th><th class="num">Programado</th><th class="num">Ejecutado</th><th class="num">Gastado</th><th class="num">Cobrado</th><th class="num">Programado acum.</th><th class="num">Ejecutado acum.</th></tr></thead>
         <tbody id="tablaAvanceSemanas"></tbody>
       </table>
     </div></div>
     <h6>Registros de avance</h6>
-    <div class="card"><div class="table-responsive">
+    <div class="card"><div class="table-responsive tabla-alta">
       <table class="table table-sm mb-0 align-middle">
         <thead><tr><th>Fecha</th><th>Concepto</th><th class="num">Cantidad</th><th class="num">Importe</th><th>Notas</th><th>Registró</th><th></th></tr></thead>
         <tbody id="tablaRegistros"></tbody>
@@ -193,8 +197,12 @@ $soloOficina = $esIngeniero ? ' d-none' : '';
         <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Costo programado</div><div class="stat-value fs-5" id="fCosto">–</div><div class="small text-muted" id="fCostoSub"></div></div></div>
         <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Saldo mínimo programado</div><div class="stat-value fs-5" id="fSaldoMin">–</div><div class="small text-muted" id="fSaldoMinSub"></div></div></div>
       </div>
+      <div class="card mb-3">
+        <div class="card-titulo"><div><h3>Saldo de caja de la obra</h3><p>Programado (anticipo y estimaciones contra costos del programa) y real (control de obra)</p></div></div>
+        <div class="p-3"><div class="grafica" id="gFlujo"></div></div>
+      </div>
       <h6>Flujo de efectivo</h6>
-      <div class="card mb-3"><div class="table-responsive">
+      <div class="card mb-3"><div class="table-responsive tabla-alta">
         <table class="table table-sm mb-0 tabla-semanas">
           <thead>
             <tr><th rowspan="2">Semana</th><th colspan="7" class="grupo">Programado</th><th colspan="3" class="grupo">Real</th></tr>
@@ -1041,6 +1049,7 @@ async function cargarAvance() {
         <td class="num">${money(s.programado)}</td><td class="num">${money(s.ejecutado)}</td><td class="num">${money(s.gastado)}</td><td class="num">${money(s.cobrado)}</td>
         <td class="num">${money(s.programado_acum)}</td><td class="num ${s.ejecutado_acum + 0.01 < s.programado_acum && s.inicio <= hoy ? 'text-danger' : ''}">${money(s.ejecutado_acum)}</td></tr>`).join('')
         || '<tr><td colspan="7" class="text-muted">Sin programa</td></tr>';
+    graficaCurvaS(a.semanas, hoy);
 
     const tr = document.getElementById('tablaRegistros');
     tr.innerHTML = a.registros.length ? '' : '<tr><td colspan="7" class="text-muted">Sin registros de avance</td></tr>';
@@ -1178,8 +1187,52 @@ async function cargarFlujo() {
         <td class="num ${rojo(ultima.saldo)}">${money(ultima.saldo)}</td>
         <td class="num">${money(suma('real_ingresos'))}</td><td class="num">${money(suma('real_egresos'))}</td><td class="num ${rojo(ultima.real_saldo)}">${money(ultima.real_saldo)}</td></tr>`;
 
+    graficaFlujo(f.semanas, hoy);
     tablaPorSemana('tablaCompras', f.materiales, f.semanas, 'Material', 'Los análisis no tienen materiales');
     tablaPorSemana('tablaManoObra', f.mano_obra, f.semanas, 'Cuadrilla (jornadas)', 'Los análisis no tienen mano de obra');
+}
+
+/** Nombre corto de cada semana para el eje: "S3 · 12/01". */
+function etiquetaSemana(s) {
+    return `S${s.numero} · ${fecha(s.inicio).slice(0, 5)}`;
+}
+
+/** Curva S: acumulado programado contra ejecutado y gastado; la línea vertical es la semana actual. */
+function graficaCurvaS(semanas, hoy) {
+    document.getElementById('cardCurvaS').classList.toggle('d-none', !semanas.length);
+    if (!semanas.length) return;
+    const actual = semanas.findIndex((s) => s.inicio <= hoy && hoy <= s.fin);
+    // Lo ejecutado y gastado solo llega hasta hoy; después la línea se corta.
+    const hastaHoy = (k) => semanas.map((s) => (s.inicio <= hoy ? s[k] : null));
+    grafica('gCurvaS', {
+        xAxis: { ...ejeCategorias(semanas.map(etiquetaSemana)), boundaryGap: false },
+        yAxis: ejeMontos(),
+        tooltip: { trigger: 'axis', backgroundColor: COLORES.navy, borderWidth: 0, textStyle: { color: '#fff', fontSize: 12 }, valueFormatter: (v) => (v === null ? '—' : money(v)) },
+        series: [
+            { name: 'Programado', type: 'line', symbol: 'none', color: COLORES.slate, lineStyle: { type: 'dashed', width: 2 },
+                data: semanas.map((s) => s.programado_acum),
+                markLine: actual >= 0 ? { symbol: 'none', silent: true, label: { formatter: 'Hoy', color: COLORES.texto, fontSize: 11 },
+                    lineStyle: { color: COLORES.navy, type: 'solid', width: 1, opacity: .4 }, data: [{ xAxis: actual }] } : undefined },
+            { name: 'Ejecutado', type: 'line', symbol: 'circle', symbolSize: 5, color: COLORES.brand, lineStyle: { width: 3 },
+                areaStyle: { color: 'rgba(47,117,181,.08)' }, data: hastaHoy('ejecutado_acum') },
+            { name: 'Gastado', type: 'line', symbol: 'circle', symbolSize: 5, color: COLORES.warning, lineStyle: { width: 2 }, data: hastaHoy('gastado_acum') },
+        ],
+    });
+}
+
+/** Saldo de caja de la obra por semana: programado contra real, con ingresos y egresos programados como barras. */
+function graficaFlujo(semanas, hoy) {
+    grafica('gFlujo', {
+        xAxis: ejeCategorias(semanas.map(etiquetaSemana)),
+        yAxis: ejeMontos(),
+        series: [
+            { name: 'Ingresos programados', type: 'bar', barMaxWidth: 14, color: '#b7e4cf', data: semanas.map((s) => s.ingresos) },
+            { name: 'Egresos programados', type: 'bar', barMaxWidth: 14, color: COLORES.claro, data: semanas.map((s) => -s.egresos) },
+            { name: 'Saldo programado', type: 'line', symbol: 'none', color: COLORES.slate, lineStyle: { type: 'dashed', width: 2 }, data: semanas.map((s) => s.saldo) },
+            { name: 'Saldo real', type: 'line', symbol: 'circle', symbolSize: 5, color: COLORES.navy, lineStyle: { width: 3 },
+                data: semanas.map((s) => (s.inicio <= hoy ? s.real_saldo : null)) },
+        ],
+    });
 }
 
 async function actualizarPrecios() {

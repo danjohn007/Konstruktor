@@ -13,7 +13,7 @@ class CuadrillasController
     public function index(): void
     {
         Auth::requireLogin();
-        Response::view('cuadrillas/index', ['user' => Auth::user(), 'titulo' => 'Cuadrillas']);
+        Response::view('cuadrillas/index', ['user' => Auth::user(), 'titulo' => 'Cuadrillas', 'subtitulo' => 'Integrantes y salario de cada cuadrilla; el costo por jornada incluye prestaciones e impuestos']);
     }
 
     public function apiIndex(): void

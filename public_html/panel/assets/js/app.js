@@ -26,6 +26,83 @@ function pct(n) {
     return numero((Number(n) || 0) * 100, 2) + '%';
 }
 
+/** Montos cortos para ejes y tarjetas: $1.28 M, $742 k. */
+function moneyCorto(n) {
+    const v = Number(n) || 0;
+    const a = Math.abs(v);
+    const signo = v < 0 ? '-' : '';
+    if (a >= 1e6) return signo + '$' + numero(a / 1e6, a >= 1e7 ? 1 : 2) + ' M';
+    if (a >= 1e3) return signo + '$' + numero(a / 1e3, 0) + ' k';
+    return money(v);
+}
+
+const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+
+/** "2026-03" → "mar 26" */
+function mesCorto(ym) {
+    const [y, m] = ym.split('-');
+    return `${MESES[Number(m) - 1]} ${y.slice(2)}`;
+}
+
+/** Colores de las gráficas: los de la marca y los de estado. */
+const COLORES = {
+    brand: '#2f75b5', claro: '#8fbbe2', navy: '#0f2742', success: '#22a06b', warning: '#f7881f',
+    danger: '#e5484d', teal: '#00a0a8', purple: '#6048d0', slate: '#94a3b8', linea: '#eef2f6', texto: '#64748b',
+};
+
+function ejeCategorias(datos) {
+    return {
+        type: 'category', data: datos, axisTick: { show: false },
+        axisLine: { lineStyle: { color: '#e2e8f0' } }, axisLabel: { color: COLORES.texto, fontSize: 11 },
+    };
+}
+
+function ejeMontos() {
+    return {
+        type: 'value', axisLabel: { color: COLORES.texto, fontSize: 11, formatter: moneyCorto },
+        splitLine: { lineStyle: { color: COLORES.linea } },
+    };
+}
+
+/**
+ * Gráfica ECharts con el estilo del sistema (requiere 'graficas' => true en la vista).
+ * Se redibuja sola al cambiar de tamaño, también cuando estaba en una pestaña oculta.
+ */
+function grafica(el, opciones) {
+    if (typeof el === 'string') el = document.getElementById(el);
+    const g = echarts.getInstanceByDom(el) || echarts.init(el, null, { renderer: 'svg' });
+    g.setOption({
+        textStyle: { fontFamily: getComputedStyle(document.body).fontFamily },
+        color: [COLORES.brand, COLORES.success, COLORES.warning, COLORES.navy, COLORES.teal, COLORES.purple, COLORES.slate],
+        grid: { left: 4, right: 8, top: 36, bottom: 4, containLabel: true },
+        legend: { top: 0, left: 0, icon: 'roundRect', itemWidth: 10, itemHeight: 10, textStyle: { color: COLORES.texto, fontSize: 12 } },
+        tooltip: {
+            trigger: 'axis', backgroundColor: COLORES.navy, borderWidth: 0, padding: [8, 12],
+            textStyle: { color: '#fff', fontSize: 12 }, valueFormatter: (v) => money(v),
+            axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(47,117,181,.06)' } },
+        },
+        ...opciones,
+    }, true);
+    if (!el.dataset.observada) {
+        new ResizeObserver(() => g.resize()).observe(el);
+        el.dataset.observada = '1';
+    }
+    return g;
+}
+
+/** Barra de avance real (relleno) contra programado (marca); en naranja si va atrasado. */
+function barraRealVsProgramado(real, programado) {
+    const atrasada = real + 0.005 < programado;
+    const p = (v) => Math.max(0, Math.min(100, v * 100)).toFixed(1);
+    return `<div class="avance-barra${atrasada ? ' atrasada' : ''}" title="Real ${pct(real)} · programado ${pct(programado)}">`
+        + `<span style="width:${p(real)}%"></span><i style="left:${p(programado)}%"></i></div>`;
+}
+
+/** Monto sin centavos para tarjetas de indicadores. */
+function moneyEntero(n) {
+    return (Number(n) || 0).toLocaleString('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 });
+}
+
 function fecha(iso) {
     if (!iso) return '';
     const [y, m, d] = iso.slice(0, 10).split('-');

@@ -14,7 +14,7 @@ class UsuariosController
     public function index(): void
     {
         Auth::requireRole('Admin');
-        Response::view('usuarios/index', ['user' => Auth::user(), 'titulo' => 'Usuarios']);
+        Response::view('usuarios/index', ['user' => Auth::user(), 'titulo' => 'Usuarios', 'subtitulo' => 'Quién entra al sistema y con qué permisos']);
     }
 
     public function apiIndex(): void

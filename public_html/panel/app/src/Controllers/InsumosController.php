@@ -13,7 +13,11 @@ class InsumosController
     public function index(): void
     {
         Auth::requireLogin();
-        Response::view('insumos/index', ['user' => Auth::user(), 'titulo' => 'Insumos']);
+        Response::view('insumos/index', [
+            'user' => Auth::user(),
+            'titulo' => 'Insumos',
+            'subtitulo' => 'Materiales, equipo y mano de obra con los que se arman los análisis de precio unitario',
+        ]);
     }
 
     public function apiIndex(): void
@@ -37,7 +41,7 @@ class InsumosController
             $params[] = $_GET['categoria'];
         }
 
-        $limit = min(500, max(1, (int) ($_GET['limit'] ?? 500)));
+        $limit = min(2000, max(1, (int) ($_GET['limit'] ?? 500)));
         $stmt = Database::pdo()->prepare(
             'SELECT * FROM insumos WHERE ' . implode(' AND ', $where) . " ORDER BY tipo, categoria, clave LIMIT $limit"
         );

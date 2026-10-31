@@ -14,7 +14,7 @@ class ConfiguracionController
     public function index(): void
     {
         Auth::requireRole('Admin');
-        Response::view('configuracion/index', ['user' => Auth::user(), 'titulo' => 'Configuración']);
+        Response::view('configuracion/index', ['user' => Auth::user(), 'titulo' => 'Configuración', 'subtitulo' => 'Datos de la empresa, porcentajes por defecto y textos del presupuesto']);
     }
 
     public function apiShow(): void

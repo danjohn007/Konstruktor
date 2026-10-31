@@ -20,7 +20,9 @@ class CotizacionesController
     public function index(): void
     {
         Auth::requireLogin();
-        Response::view('cotizaciones/index', ['user' => Auth::user(), 'titulo' => Auth::esIngeniero() ? 'Obras' : 'Cotizaciones']);
+        Response::view('cotizaciones/index', Auth::esIngeniero()
+            ? ['user' => Auth::user(), 'titulo' => 'Obras', 'subtitulo' => 'Obras en ejecución: registra el avance y los gastos de cada una']
+            : ['user' => Auth::user(), 'titulo' => 'Cotizaciones y obras', 'subtitulo' => 'Cada cotización aceptada es una obra: ahí se llevan avance, estimaciones y gastos']);
     }
 
     public function show(string $id): void
@@ -32,7 +34,13 @@ class CotizacionesController
             echo 'Cotización no encontrada';
             return;
         }
-        Response::view('cotizaciones/detalle', ['user' => Auth::user(), 'titulo' => 'Cotización ' . $cot['folio'], 'cotizacionId' => (int) $id]);
+        Response::view('cotizaciones/detalle', [
+            'user' => Auth::user(),
+            'titulo' => 'Cotización ' . $cot['folio'],
+            'migas' => [(Auth::esIngeniero() ? 'Obras' : 'Cotizaciones') => 'cotizaciones'],
+            'cotizacionId' => (int) $id,
+            'graficas' => true,
+        ]);
     }
 
     public function presupuesto(string $id): void
