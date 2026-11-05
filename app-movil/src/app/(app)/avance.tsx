@@ -4,17 +4,17 @@ import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, Vi
 
 import { FotoAdjunta } from '@/components/foto-adjunta';
 import { SelectorConcepto } from '@/components/selector-concepto';
-import { Boton, Campo, Opciones, Tarjeta, estilos as ui } from '@/components/ui';
+import { Anillo, Boton, Campo, Opciones, Tarjeta, estilos as ui } from '@/components/ui';
 import { obtener } from '@/lib/api';
 import { encolar } from '@/lib/cola';
-import { fecha, haceDiasISO, leerNumero, numero } from '@/lib/formato';
+import { fecha, haceDiasISO, leerNumero, numero, pct } from '@/lib/formato';
 import { Colores, Espacio } from '@/lib/tema';
 import type { Avance } from '@/lib/tipos';
 
 const DIAS = [
-  { valor: '0', texto: 'Hoy' },
-  { valor: '1', texto: 'Ayer' },
-  { valor: '2', texto: 'Antier' },
+  { valor: '0', texto: 'Hoy', icono: 'calendar-today' },
+  { valor: '1', texto: 'Ayer', icono: 'calendar-arrow-left' },
+  { valor: '2', texto: 'Antier', icono: 'calendar-blank-outline' },
 ] as const;
 
 /** Hoja AVANCE: cantidad ejecutada de un concepto en un día, con foto opcional. */
@@ -85,11 +85,18 @@ export default function RegistrarAvance() {
       <ScrollView contentContainerStyle={s.contenido} keyboardShouldPersistTaps="handled">
         <SelectorConcepto etiqueta="Concepto" conceptos={opciones} valor={conceptoId} onCambio={setConceptoId} />
         {concepto && (
-          <Tarjeta style={{ gap: 2 }}>
-            <Text style={ui.textoSuave}>
-              Contratado {numero(concepto.cantidad)} {concepto.unidad} · ejecutado {numero(concepto.ejecutado)} · faltan {numero(Math.max(0, concepto.cantidad - concepto.ejecutado))}
-            </Text>
-            <Text style={ui.textoSuave}>Según el programa debería ir en {numero(concepto.programado)} {concepto.unidad}.</Text>
+          <Tarjeta style={s.resumen}>
+            <Anillo valor={concepto.pct} programado={concepto.pct_programado} tam={58} grosor={6}>
+              <Text style={s.anillo}>{pct(concepto.pct)}</Text>
+            </Anillo>
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={[ui.texto, { fontWeight: '700' }]}>
+                {numero(concepto.ejecutado)} de {numero(concepto.cantidad)} {concepto.unidad}
+              </Text>
+              <Text style={ui.textoSuave}>
+                Faltan {numero(Math.max(0, concepto.cantidad - concepto.ejecutado))} · debería ir en {numero(concepto.programado)}
+              </Text>
+            </View>
           </Tarjeta>
         )}
         <Opciones etiqueta="Fecha" opciones={DIAS} valor={dia} onCambio={setDia} />
@@ -112,4 +119,6 @@ export default function RegistrarAvance() {
 
 const s = StyleSheet.create({
   contenido: { padding: Espacio.l, gap: Espacio.l, paddingBottom: Espacio.xl * 2 },
+  resumen: { flexDirection: 'row', alignItems: 'center', gap: Espacio.m },
+  anillo: { fontSize: 12, fontWeight: '800', color: Colores.navy },
 });

@@ -2,15 +2,19 @@
   "expo": {
     "name": "Konstruktor",
     "slug": "konstruktor-obra",
+    "owner": "impactos-digitales",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "konstruktor",
     "userInterfaceStyle": "light",
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "ios": {
       "bundleIdentifier": "mx.konstruktor.obra",
-      "supportsTablet": true,
+      "supportsTablet": false,
       "config": {
         "usesNonExemptEncryption": false
       }
@@ -18,7 +22,7 @@
     "android": {
       "package": "mx.konstruktor.obra",
       "adaptiveIcon": {
-        "backgroundColor": "#0f2742",
+        "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
@@ -52,6 +56,16 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "e560acd0-5cb3-4b51-a1b8-6f032f461731"
+      }
     }
   }
 }

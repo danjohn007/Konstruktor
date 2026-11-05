@@ -153,3 +153,10 @@ export const NOMBRE_CATEGORIA: Record<string, string> = {
 };
 
 export const FORMAS_PAGO = ['Efectivo', 'Transferencia', 'Tarjeta', 'Cheque'] as const;
+
+/** GET /api/ingeniero/resumen: lo que registró el usuario (sirve para cualquier rol). */
+export type MiSemana = {
+  semana: { avances: number; gastos: number; gastado: number; sin_comprobante: number };
+  avances: { fecha: string; cantidad: string; folio: string; clave: string; descripcion: string; unidad: string; cotizacion_id: number; foto: number }[];
+  gastos: { fecha: string; categoria: string; descripcion: string; monto: string; folio: string; cotizacion_id: number; comprobante: number }[];
+};

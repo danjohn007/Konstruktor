@@ -56,6 +56,16 @@ export async function guardarCredenciales(nuevoServidor: string, nuevoToken: str
 export async function borrarCredenciales(): Promise<void> {
   token = null;
   await SecureStore.deleteItemAsync(CLAVE_TOKEN);
+  await borrarCache();
+}
+
+/** Consultas guardadas para usar sin señal (obras, avance, gastos). */
+export async function contarCache(): Promise<number> {
+  const claves = await AsyncStorage.getAllKeys();
+  return claves.filter((k) => k.startsWith(PREFIJO_CACHE)).length;
+}
+
+export async function borrarCache(): Promise<void> {
   const claves = await AsyncStorage.getAllKeys();
   await AsyncStorage.multiRemove(claves.filter((k) => k.startsWith(PREFIJO_CACHE)));
 }
@@ -72,6 +82,14 @@ export function servidorActual(): string {
 /** Encabezados para cargar archivos protegidos (p. ej. la foto de un comprobante en <Image>). */
 export function encabezadosAuth(): Record<string, string> {
   return token ? { Authorization: `Bearer ${token}`, 'X-Auth-Token': token } : {};
+}
+
+/** Rechaza con SinConexion si la respuesta tarda más de `ms` (señal débil en obra). */
+export function conLimite<T>(promesa: Promise<T>, ms: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => reject(new SinConexion()), ms);
+    promesa.then(resolve, reject).finally(() => clearTimeout(t));
+  });
 }
 
 async function solicitar(url: string, init: RequestInit): Promise<Response> {
@@ -115,7 +133,7 @@ export async function subirArchivo(ruta: string, uri: string): Promise<void> {
 export async function obtener<T>(ruta: string): Promise<{ datos: T; deCache: boolean; guardado?: string }> {
   try {
     const datos = await api<T>(ruta);
-    AsyncStorage.setItem(PREFIJO_CACHE + ruta, JSON.stringify({ datos, guardado: new Date().toISOString() })).catch(() => {});
+    guardarCopia(ruta, datos).catch(() => {});
     return { datos, deCache: false };
   } catch (e) {
     if (!(e instanceof SinConexion)) throw e;
@@ -124,4 +142,28 @@ export async function obtener<T>(ruta: string): Promise<{ datos: T; deCache: boo
     const { datos, guardado } = JSON.parse(copia) as { datos: T; guardado: string };
     return { datos, deCache: true, guardado };
   }
+}
+
+function guardarCopia(ruta: string, datos: unknown): Promise<void> {
+  return AsyncStorage.setItem(PREFIJO_CACHE + ruta, JSON.stringify({ datos, guardado: new Date().toISOString() }));
+}
+
+/**
+ * Descarga de una vez todo lo que se consulta en obra (lista de obras y, de cada una,
+ * avance y gastos) para tenerlo sin señal. Va obra por obra para no saturar el servidor.
+ * Devuelve cuántas obras quedaron guardadas.
+ */
+export async function descargarParaSinSenal(alAvanzar?: (hechas: number, total: number) => void): Promise<number> {
+  const obras = await api<{ id: number }[]>('/api/obras');
+  await guardarCopia('/api/obras', obras);
+  await api('/api/ingeniero/resumen')
+    .then((r) => guardarCopia('/api/ingeniero/resumen', r))
+    .catch(() => {});
+  alAvanzar?.(0, obras.length);
+  for (const [i, o] of obras.entries()) {
+    const rutas = [`/api/cotizaciones/${o.id}/avance`, `/api/cotizaciones/${o.id}/control`];
+    await Promise.all(rutas.map(async (r) => guardarCopia(r, await api(r))));
+    alAvanzar?.(i + 1, obras.length);
+  }
+  return obras.length;
 }

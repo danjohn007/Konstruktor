@@ -3,19 +3,20 @@ import { useEffect, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { FotoAdjunta } from '@/components/foto-adjunta';
+import { iconoCategoria } from '@/components/categoria';
 import { SelectorConcepto } from '@/components/selector-concepto';
 import { Boton, Campo, Opciones, estilos as ui } from '@/components/ui';
 import { obtener } from '@/lib/api';
 import { encolar } from '@/lib/cola';
 import { haceDiasISO, leerNumero, money } from '@/lib/formato';
 import { useSesion } from '@/lib/sesion';
-import { Espacio } from '@/lib/tema';
+import { Colores, Espacio } from '@/lib/tema';
 import { CATEGORIAS, FORMAS_PAGO, NO_COSTO, NOMBRE_CATEGORIA, type Control } from '@/lib/tipos';
 
 const DIAS = [
-  { valor: '0', texto: 'Hoy' },
-  { valor: '1', texto: 'Ayer' },
-  { valor: '2', texto: 'Antier' },
+  { valor: '0', texto: 'Hoy', icono: 'calendar-today' },
+  { valor: '1', texto: 'Ayer', icono: 'calendar-arrow-left' },
+  { valor: '2', texto: 'Antier', icono: 'calendar-blank-outline' },
 ] as const;
 
 /** Hoja CONTROL: un gasto (con foto del ticket) o un ingreso de la obra. */
@@ -91,11 +92,11 @@ export default function RegistrarMovimiento() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Stack.Screen options={{ title: tipo === 'egreso' ? 'Registrar gasto' : 'Registrar ingreso' }} />
       <ScrollView contentContainerStyle={s.contenido} keyboardShouldPersistTaps="handled">
-        <Campo etiqueta="Monto" value={monto} onChangeText={setMonto} keyboardType="decimal-pad" placeholder="$0.00" style={{ fontSize: 22, fontWeight: '700' }} />
+        <Campo etiqueta="Monto" icono="currency-usd" value={monto} onChangeText={setMonto} keyboardType="decimal-pad" placeholder="0.00" style={{ fontSize: 24, fontWeight: '800', color: Colores.navy }} />
         <Campo etiqueta="Descripción" value={descripcion} onChangeText={setDescripcion} placeholder={tipo === 'egreso' ? 'Ej. 35 varillas 3/8"' : 'Ej. Pago de estimación 2'} maxLength={255} />
         <Opciones
           etiqueta="Categoría"
-          opciones={CATEGORIAS[tipo].filter((c) => !esIngeniero || !NO_COSTO.includes(c)).map((c) => ({ valor: c, texto: NOMBRE_CATEGORIA[c] }))}
+          opciones={CATEGORIAS[tipo].filter((c) => !esIngeniero || !NO_COSTO.includes(c)).map((c) => ({ valor: c, texto: NOMBRE_CATEGORIA[c], icono: iconoCategoria(c) }))}
           valor={categoria}
           onCambio={setCategoria}
         />

@@ -42,3 +42,37 @@ export function leerNumero(texto: string): number | null {
   const n = Number(normal);
   return Number.isFinite(n) ? n : null;
 }
+
+/** Monto corto para tarjetas: $1.2 M, $350 k, $980. */
+export function moneyCorto(n: unknown): string {
+  const v = Number(n) || 0;
+  const a = Math.abs(v);
+  const signo = v < 0 ? '−' : '';
+  if (a >= 1e6) return `${signo}$${numero(a / 1e6, a >= 1e7 ? 0 : 1)} M`;
+  if (a >= 1e3) return `${signo}$${numero(a / 1e3, 0)} k`;
+  return `${signo}$${numero(a, 0)}`;
+}
+
+/** Días de hoy a la fecha (negativo si ya pasó). */
+export function diasHasta(iso?: string | null): number | null {
+  if (!iso) return null;
+  const [y, m, d] = iso.slice(0, 10).split('-').map(Number);
+  const hoy = new Date();
+  const fin = new Date(y, m - 1, d);
+  hoy.setHours(0, 0, 0, 0);
+  return Math.round((fin.getTime() - hoy.getTime()) / 86400000);
+}
+
+export function saludo(d = new Date()): string {
+  const h = d.getHours();
+  return h >= 5 && h < 12 ? 'Buenos días' : h >= 12 && h < 19 ? 'Buenas tardes' : 'Buenas noches';
+}
+
+/** "Hoy", "Ayer" o la fecha, para agrupar listas por día. */
+export function diaRelativo(iso: string): string {
+  const dias = diasHasta(iso);
+  if (dias === 0) return 'Hoy';
+  if (dias === -1) return 'Ayer';
+  const [y, m, d] = iso.slice(0, 10).split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'short' });
+}

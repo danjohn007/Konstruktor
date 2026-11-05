@@ -8,6 +8,7 @@ import {
   ApiError,
   borrarCredenciales,
   cargarCredenciales,
+  conLimite,
   guardarCredenciales,
   normalizarServidor,
 } from './api';
@@ -45,7 +46,8 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
       setServidor(c.servidor);
       if (c.token) {
         try {
-          const r = await api<{ user: Usuario }>('/api/auth/yo');
+          // Con señal débil no se espera de más: se entra con lo guardado (si luego responde 401, la sesión se cierra igual).
+          const r = await conLimite(api<{ user: Usuario }>('/api/auth/yo'), 6000);
           await guardarUsuario(r.user);
           setUsuario(r.user);
           sincronizar();
@@ -86,6 +88,11 @@ export function useSesion(): Sesion {
   const s = useContext(Contexto);
   if (!s) throw new Error('useSesion fuera de ProveedorSesion');
   return s;
+}
+
+/** El Admin usa la app para consultar (gráficas y cifras), no para capturar: no ve los botones de registro. */
+export function useSoloConsulta(): boolean {
+  return useSesion().usuario?.rol_nombre === 'Admin';
 }
 
 // El usuario se guarda para poder abrir la app sin señal.

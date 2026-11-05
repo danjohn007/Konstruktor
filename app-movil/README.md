@@ -7,11 +7,15 @@ Trabaja contra la API del sistema web (`../public_html/panel`) con el mismo usua
 
 | Pantalla | Equivale en el Excel a |
 |---|---|
-| **Obras**: las cotizaciones *aceptadas*, con avance real contra programado y gasto | — |
-| **Resumen** de la obra: avance físico, semana actual, cobrado, gastado y saldo de caja | AVANCE / CONTROL |
-| **Avance**: cada concepto con lo ejecutado, lo que debería ir según el programa y su estado; registrar la cantidad ejecutada del día con foto | AVANCE |
-| **Gastos**: movimientos de la obra; registrar gasto o ingreso con foto del ticket, ligado a un concepto del catálogo | CONTROL (columna CATALOGO) |
+| **Inicio**: saludo, KPIs de la cartera, "Tu semana" (avances y gastos que registraste, gastos sin ticket), buscador y filtro de obras | — |
+| **Resumen** de la obra: anillo de avance real contra programado, curva S, semana actual, cobrado, gastado y saldo de caja | AVANCE / CONTROL |
+| **Avance**: cada concepto con lo ejecutado, lo que debería ir según el programa y su estado (buscador y filtros); su **historial** con fotos; registrar la cantidad ejecutada del día con foto | AVANCE |
+| **Gastos**: reparto por categoría y movimientos por día; registrar gasto o ingreso con foto del ticket, ligado a un concepto del catálogo; agregar el ticket a un gasto ya enviado | CONTROL (columna CATALOGO) |
+| **Fotos**: galería de evidencias de avance; cada foto abre la ficha de su registro | — |
+| **Mi cuenta**: sincronización, cambiar contraseña, presentación al abrir, borrar datos descargados, WhatsApp de la oficina, versión y cerrar sesión | — |
 | **Pendientes**: lo capturado sin señal que falta enviar | — |
+
+**Por rol:** el **Ingeniero** ve solo sus obras asignadas y registra avance y gastos (sin ingresos ni préstamos). El **Cotizador** registra también ingresos. El **Admin** entra en modo consulta (`useSoloConsulta`): no ve botones de registro y en su lugar tiene gráficas: en Inicio, el dinero de la cartera y una fila compacta por obra (la más atrasada primero); en el Resumen de cada obra, el estado de los conceptos y el flujo cobrado/gastado por semana. El buscador y los filtros de obras aparecen para todos a partir de 6 obras. La restricción es solo en la app; desde la web el Admin puede corregir capturas.
 
 **Sin señal en obra:** todo lo que se guarda entra primero a una cola en el teléfono y se envía solo al recuperar la conexión o al volver a abrir la app. Cada registro lleva un `uuid`, así que si un envío se repite el servidor no lo duplica. Las pantallas de consulta muestran la última copia descargada.
 
@@ -47,8 +51,12 @@ npx expo-doctor
 ```
 src/app/_layout.tsx            Sesión: con usuario → (app), sin usuario → login (Stack.Protected)
 src/app/login.tsx
-src/app/(app)/index.tsx        Lista de obras
-src/app/(app)/obra/[id].tsx    Resumen · Avance · Gastos
+src/app/(app)/index.tsx        Inicio: KPIs, "Tu semana" y lista de obras
+src/app/(app)/obra/[id].tsx    Resumen · Avance · Gastos · Fotos
+src/app/(app)/concepto.tsx     Historial de un concepto
+src/app/(app)/registro.tsx     Ficha de un avance registrado (con su foto)
+src/app/(app)/ajustes.tsx      Mi cuenta y ajustes
+src/app/(app)/contrasena.tsx   Cambiar contraseña
 src/app/(app)/avance.tsx       Registrar avance
 src/app/(app)/movimiento.tsx   Registrar gasto / ingreso
 src/app/(app)/comprobante.tsx  Ver la foto de un ticket o de un avance
@@ -57,6 +65,11 @@ src/lib/api.ts                 Cliente de la API (token Bearer, caché para cons
 src/lib/cola.ts                Cola de pendientes y sincronización
 src/lib/sesion.tsx             Login / logout
 src/lib/imagen.ts              Cámara / galería y reducción de fotos a 1600 px JPEG
+src/components/intro.tsx       Presentación al abrir la app (la grúa baja el logo; se salta con un toque)
+src/components/escena-obra.tsx Ciudad que se construye piso por piso (intro y login), como el login web
+src/components/curva-avance.tsx Curva S (programado contra real)
+src/components/ui.tsx          Componentes base: tarjetas, anillo de avance, KPIs, pestañas, esqueletos
+src/lib/preferencias.ts        Preferencias del teléfono (presentación al abrir)
 ```
 
 ## Publicar en Play Store y App Store
@@ -71,10 +84,7 @@ Las compilaciones se hacen en la nube con **EAS**, sin Android Studio ni Mac. Se
    - `android-icon-foreground.png`: 1024×1024 transparente, con el logo dentro del 66 % central.
    - `android-icon-monochrome.png`: igual que el anterior, en blanco.
    - `splash-icon.png`: transparente.
-3. **Servidor de producción:** en `eas.json`, agrega a los perfiles `preview` y `production` lo siguiente:
-   ```json
-   "env": { "EXPO_PUBLIC_API_URL": "https://konstruktor.com.mx/panel" }
-   ```
+3. **Servidor de producción:** ya está en `eas.json` (`env.EXPO_PUBLIC_API_URL` de los perfiles `preview` y `production`, hoy `https://konstruktor.com.mx/panel`). `.env.local` no se sube a EAS, así que si cambia el dominio hay que cambiarlo ahí.
 4. Ejecuta:
    ```bash
    npx eas-cli@latest login
